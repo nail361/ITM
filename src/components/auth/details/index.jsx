@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../../store/auth";
-import { View, Text, TextInput, Pressable } from "react-native";
+import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import CustomButton from "../../ui/button";
 
 import styles from "./styles";
 import { Colors } from "react-native/Libraries/NewAppScreen";
 import { createUser, loginUser } from "../../../utils/auth";
 import Loading from "../../ui/loading";
+import { useNavigation } from "@react-navigation/native";
 
 export default function AuthDetails(props) {
   const { route } = props;
+  const navigation = useNavigation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [correctData, setCorrectData] = useState(false);
@@ -32,26 +34,38 @@ export default function AuthDetails(props) {
 
   async function onCreateUser() {
     setLoading(true);
-    const data = await createUser(email, password);
-
-    /*
-    dispatch(
-      authActions.login({ token: data.token, email: email.current?.value }),
-    );*/
-
-    setLoading(false);
+    try {
+      const response = await createUser(email, password);
+      dispatch(
+        authActions.login({
+          token: response.data.idToken,
+          email: response.data.email,
+          localID: response.data.localId,
+        }),
+      );
+      navigation.replace("Main");
+    } catch (e) {
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function onLoginUser() {
     setLoading(true);
-    const data = await loginUser(email, password);
-
-    /*
-    dispatch(
-      authActions.login({ token: data.token, email: email.current?.value }),
-    );*/
-
-    setLoading(false);
+    try {
+      const response = await loginUser(email, password);
+      dispatch(
+        authActions.login({
+          token: response.data.idToken,
+          email: response.data.email,
+          localID: response.data.localId,
+        }),
+      );
+      navigation.replace("Main");
+    } catch (e) {
+    } finally {
+      setLoading(false);
+    }
   }
 
   if (loading) return <Loading />;

@@ -23,5 +23,6 @@ const styles = StyleSheet.create({
     fontFamily: "ubuntu",
     fontSize: 34,
     textAlign: "center",
+    color: Colors.headerTextColor,
   },
 });

@@ -1,10 +1,10 @@
 import Constants from "expo-constants";
-import { useCallback } from "react";
-import { Provider, useSelector } from "react-redux";
-import { RootState } from "../../store";
+import { useCallback, useEffect, useState } from "react";
+import { Provider } from "react-redux";
 import { Entypo, Fontisto } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
@@ -20,8 +20,10 @@ import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
 import store from "./src/store";
+import { checkAuth } from "./src/store/auth";
 
 const Tab = createBottomTabNavigator();
+const Stack = createNativeStackNavigator();
 
 SplashScreen.preventAutoHideAsync();
 
@@ -38,7 +40,24 @@ if (!firebaseConfig) {
 }
 */
 export default function App() {
-  // const token = useSelector((state: RootState) => state.auth.token);
+  const [isAuth, setAuth] = useState(store.getState().auth.isAuth);
+  let prevValue = isAuth;
+
+  function handleStoreChange() {
+    const auth = store.getState().auth.isAuth;
+    if (prevValue !== auth) {
+      setAuth(auth);
+      prevValue = auth;
+      console.log(`APP - ${auth}`);
+    }
+  }
+
+  const unsubscribe = store.subscribe(handleStoreChange);
+  // unsubscribe();
+
+  useEffect(() => {
+    store.dispatch(checkAuth());
+  }, []);
 
   const [fontsLoaded] = useFonts({
     ubuntu: require("./assets/fonts/Ubuntu/Ubuntu-Regular.ttf"),
@@ -58,66 +77,72 @@ export default function App() {
 
   const devideWidth = Dimensions.get("window").width;
 
-  if (true)
+  function Tabs() {
     return (
-      <Provider store={store}>
-        <SafeAreaView style={styles.mainView} onLayout={onLayoutRootView}>
-          <Auth />
-        </SafeAreaView>
-      </Provider>
+      <Tab.Navigator
+        initialRouteName="Globe"
+        screenOptions={{
+          tabBarActiveTintColor: "blue",
+        }}
+      >
+        <Tab.Screen
+          name="Globe"
+          component={Globe}
+          options={{
+            title: "Globe",
+            tabBarIcon: ({ color, size }) => (
+              <Entypo name="globe" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Record"
+          component={Moment}
+          options={{
+            title: "Moment",
+            tabBarIcon: ({ color, size }) => (
+              <Entypo name="video-camera" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Local"
+          component={Local}
+          options={{
+            title: "Local",
+            tabBarIcon: ({ color, size }) => (
+              <Fontisto name="map-marker-alt" size={24} color={color} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Profile"
+          component={Profile}
+          options={{
+            title: "My Profile",
+            tabBarIcon: ({ color, size }) => (
+              <Entypo name="v-card" size={24} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
     );
+  }
 
   return (
     <Provider store={store}>
       <View onLayout={onLayoutRootView} style={styles.mainView}>
         <NavigationContainer>
-          <Tab.Navigator
-            initialRouteName="Globe"
+          <Stack.Navigator
+            initialRouteName={isAuth ? "Main" : "Auth"}
             screenOptions={{
-              tabBarActiveTintColor: "blue",
+              headerBackVisible: false,
+              headerShown: false,
             }}
           >
-            <Tab.Screen
-              name="Globe"
-              component={Globe}
-              options={{
-                title: "Globe",
-                tabBarIcon: ({ color, size }) => (
-                  <Entypo name="globe" size={24} color={color} />
-                ),
-              }}
-            />
-            <Tab.Screen
-              name="Record"
-              component={Moment}
-              options={{
-                title: "Moment",
-                tabBarIcon: ({ color, size }) => (
-                  <Entypo name="video-camera" size={24} color={color} />
-                ),
-              }}
-            />
-            <Tab.Screen
-              name="Local"
-              component={Local}
-              options={{
-                title: "Local",
-                tabBarIcon: ({ color, size }) => (
-                  <Fontisto name="map-marker-alt" size={24} color={color} />
-                ),
-              }}
-            />
-            <Tab.Screen
-              name="Profile"
-              component={Profile}
-              options={{
-                title: "My Profile",
-                tabBarIcon: ({ color, size }) => (
-                  <Entypo name="v-card" size={24} color={color} />
-                ),
-              }}
-            />
-          </Tab.Navigator>
+            <Stack.Screen name="Auth" component={Auth} />
+            <Stack.Screen name="Main" component={Tabs} />
+          </Stack.Navigator>
         </NavigationContainer>
         <StatusBar style="auto" />
       </View>
