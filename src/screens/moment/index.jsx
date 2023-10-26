@@ -17,10 +17,14 @@ function Moment() {
   const camera = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const [video, setVideo] = useState();
-  const [galleryItems, setGalleryItems] = useState<any>([]);
+  const [galleryItems, setGalleryItems] = useState([]);
   const [videoIsLoading, setVideoIsLoading] = useState(false);
   const [progress, setProgress] = useState(VIDEO_MAX_DURATION / 1000);
   const [cameraDirection, setCameraDirection] = useState(CameraType.back);
+  const [cameraFlash, setCameraFlash] = useState(
+    Camera.Constants.FlashMode.off,
+  );
+  const [isCameraReady, setCameraReady] = useState(false);
 
   const [cameraPermission, setCameraPermission] = useState(false);
   const [audioPermission, setAudioPermission] = useState(false);
@@ -45,13 +49,17 @@ function Moment() {
           sortBy: ["creationTime"],
           mediaType: ["video"],
         });
-        setGalleryItems(userGalleryMedia);
+        setGalleryItems(userGalleryMedia.assets);
       }
     })();
   }, []);
 
   if (!cameraPermission || !audioPermission || !galleryPermission) {
-    return <View></View>;
+    return (
+      <View>
+        <Text></Text>
+      </View>
+    );
   }
 
   const progressAnimation = new Animated.Value(0);
@@ -81,7 +89,7 @@ function Moment() {
     ],
   });
 
-  const onPlaybackStatusUpdate = async (status: any) => {
+  const onPlaybackStatusUpdate = async (status) => {
     /*
     // THIS FUNCTION DOESN'T ACTUALLY DO ANYTHING RIGHT NOW.
     // I tried messing around with it to manually loop the video and see if that would fix it, but no luck...
@@ -107,25 +115,44 @@ function Moment() {
   };
 
   const onToggleRecord = async () => {
-    if (camera) {
-      setIsRecording((prevState) => {
-        console.log("RECORDING STARTED");
+    if (camera.current) {
+      if (!isRecording) {
+        try {
+          const options = {
+            maxDuration: VIDEO_MAX_DURATION / 1000,
+            quality: Camera.Constants.VideoQuality["480"],
+          };
 
-        // animateProgressBar();
-        // startCountdown();
+          const videoRecordPromise = camera.current.recordAsync(options);
+          if (videoRecordPromise) {
+            setIsRecording(true);
+            const data = await videoRecordPromise;
+            const source = data.uri;
+          }
 
-        /*
-        const video = await camera.recordAsync({
-          maxDuration: VIDEO_MAX_DURATION / 1000,
-        });
-        */
-        // this.isRecording = false;
+          // animateProgressBar();
+          // startCountdown();
+          // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+        } catch (error) {
+          console.warn(error);
+        }
+      } else {
+        camera.current.stopRecording();
+        setIsRecording(false);
+      }
+    }
+  };
 
-        // console.log(video);
-        // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
+  const onGalleryPress = async () => {
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Videos,
+      allowsEditing: true,
+      aspect: [16, 9],
+      quality: 1,
+    });
 
-        return !prevState;
-      });
+    if (!result.canceled) {
+      // TODO:  pass video uri into save component
     }
   };
 
@@ -179,7 +206,14 @@ function Moment() {
 
   return (
     <View style={styles.container}>
-      <Camera style={styles.camera} type={cameraDirection} ref={camera} />
+      <Camera
+        style={styles.camera}
+        type={cameraDirection}
+        flashMode={cameraFlash}
+        onCameraReady={() => setCameraReady(true)}
+        ref={camera}
+        ratio={"16:9"}
+      />
       {/* <ProgressBar
         video={video}
         isRecording={isRecording}
@@ -188,11 +222,15 @@ function Moment() {
         cancelMedia={this.cancelMedia}
         videoIsLoading={videoIsLoading}
       /> */}
-      <CameraOverlay
-        onPress={onToggleRecord}
-        video={video}
-        isRecording={isRecording}
-      />
+      {isCameraReady && (
+        <CameraOverlay
+          onToggleRecord={onToggleRecord}
+          onGalleryPress={onGalleryPress}
+          video={video}
+          isRecording={isRecording}
+          gallery={galleryItems}
+        />
+      )}
       {/* <Preview
         video={video}
         handleVideoRef={this.handleVideoPlayerRef}

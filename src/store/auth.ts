@@ -4,14 +4,14 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 interface storeProps {
   isAuth: boolean;
   email: string;
-  localId: string;
+  uid: string;
   token: string;
 }
 
 const initialState: storeProps = {
   isAuth: false,
   email: "",
-  localId: "",
+  uid: "",
   token: "",
 };
 
@@ -34,14 +34,14 @@ const slice = createSlice({
       state.isAuth = true;
       state.token = action.payload.token;
       state.email = action.payload.email;
-      state.localId = action.payload.localId;
+      state.uid = action.payload.uid;
       AsyncStorage.setItem(storageItemKey, action.payload.token);
     },
     logout(state) {
       state.isAuth = false;
       state.token = "";
       state.email = "";
-      state.localId = "";
+      state.uid = "";
       AsyncStorage.removeItem(storageItemKey);
     },
   },

@@ -15,12 +15,11 @@ import Local from "./src/screens/local";
 import Moment from "./src/screens/moment";
 import Profile from "./src/screens/profile";
 import Auth from "./src/screens/auth";
-
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
+import { initFirebase } from "./src/utils/auth";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -48,15 +47,18 @@ export default function App() {
     if (prevValue !== auth) {
       setAuth(auth);
       prevValue = auth;
-      console.log(`APP - ${auth}`);
     }
   }
 
   const unsubscribe = store.subscribe(handleStoreChange);
-  // unsubscribe();
 
   useEffect(() => {
     store.dispatch(checkAuth());
+    initFirebase();
+
+    return () => {
+      unsubscribe();
+    };
   }, []);
 
   const [fontsLoaded] = useFonts({

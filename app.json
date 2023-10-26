@@ -25,7 +25,14 @@
       "favicon": "./assets/favicon.png",
       "config": {
         "firebase": {
-          "apiKey": "AIzaSyCjA2TK9RZAcBAFGt-xQMim1ueAIEYplg4"
+          "apiKey": "AIzaSyCjA2TK9RZAcBAFGt-xQMim1ueAIEYplg4",
+          "authDomain": "inthemoment-8bfdf.firebaseapp.com",
+          "databaseURL": "https://inthemoment-8bfdf-default-rtdb.europe-west1.firebasedatabase.app",
+          "projectId": "inthemoment-8bfdf",
+          "storageBucket": "inthemoment-8bfdf.appspot.com",
+          "messagingSenderId": "833474811521",
+          "appId": "1:833474811521:web:38278abfebc750061e9f80",
+          "measurementId": "G-MJWZNJWHEM"
         }
       }
     },

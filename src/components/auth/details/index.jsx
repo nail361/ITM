@@ -5,7 +5,6 @@ import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import CustomButton from "../../ui/button";
 
 import styles from "./styles";
-import { Colors } from "react-native/Libraries/NewAppScreen";
 import { createUser, loginUser } from "../../../utils/auth";
 import Loading from "../../ui/loading";
 import { useNavigation } from "@react-navigation/native";
@@ -38,9 +37,9 @@ export default function AuthDetails(props) {
       const response = await createUser(email, password);
       dispatch(
         authActions.login({
-          token: response.data.idToken,
-          email: response.data.email,
-          localID: response.data.localId,
+          token: response._tokenResponse.idToken,
+          email: response._tokenResponse.email,
+          uid: response._tokenResponse.localId,
         }),
       );
       navigation.replace("Main");
@@ -54,11 +53,12 @@ export default function AuthDetails(props) {
     setLoading(true);
     try {
       const response = await loginUser(email, password);
+      console.log(response);
       dispatch(
         authActions.login({
-          token: response.data.idToken,
-          email: response.data.email,
-          localID: response.data.localId,
+          token: response._tokenResponse.idToken,
+          email: response._tokenResponse.email,
+          uid: response._tokenResponse.uid,
         }),
       );
       navigation.replace("Main");
