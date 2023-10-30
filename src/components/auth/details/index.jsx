@@ -5,7 +5,7 @@ import { View, Text, TextInput, Pressable, Alert } from "react-native";
 import CustomButton from "../../ui/button";
 
 import styles from "./styles";
-import { createUser, loginUser } from "../../../utils/auth";
+import { createUser, loginUser } from "../../../utils/firebase";
 import Loading from "../../ui/loading";
 import { useNavigation } from "@react-navigation/native";
 

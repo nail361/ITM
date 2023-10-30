@@ -19,7 +19,6 @@ const storageItemKey = "token";
 
 export const checkAuth = createAsyncThunk("checkAuth", async () => {
   const storedToken = await AsyncStorage.getItem(storageItemKey);
-  console.log(`TOKEN - ${storedToken}`);
   if (storedToken !== null) {
     return storedToken;
   }

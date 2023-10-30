@@ -19,7 +19,7 @@ import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
-import { initFirebase } from "./src/utils/auth";
+import { initFirebase } from "./src/utils/firebase";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();

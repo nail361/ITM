@@ -9,7 +9,7 @@ import styles from "./styles";
 
 // import ProgressBar from "../components/ProgressBar";
 import CameraOverlay from "../../components/moment/Overlay";
-// import Preview from "../components/Preview";
+import SaveVideo from "../../components/moment/SaveVideo";
 
 const VIDEO_MAX_DURATION = 60000;
 
@@ -89,31 +89,6 @@ function Moment() {
     ],
   });
 
-  const onPlaybackStatusUpdate = async (status) => {
-    /*
-    // THIS FUNCTION DOESN'T ACTUALLY DO ANYTHING RIGHT NOW.
-    // I tried messing around with it to manually loop the video and see if that would fix it, but no luck...
-    
-      // console.log('\n\n\n', status, '\n\n\n');
-    if (status.didJustFinish && !status.isLooping && !status.isPlaying) {
-      if (video) {
-        console.log('video should loop now...');
-        if (!recordingWasManuallyCancelled) {
-          // For some reason, if you manually trigger this.video.stopRecording(),
-          // then looping faces a bug after the first playback, where it just freezes indefinitely.
-          // However, if the video gets canceled on its own with the time running out from
-          // maxDuration: 4, then there's no issue  with looping after the first playback.
-          // Thus, we check if the user cancelled the recording or if it happened on its own.
-          // this.video.setIsLoopingAsync(true);
-        }
-        // await this.video.setIsLoopingAsync(true);
-        // console.log('set to loop...');
-        await video.replayAsync();
-        console.log('was replayed...');
-      }
-    }*/
-  };
-
   const onToggleRecord = async () => {
     if (camera.current) {
       if (!isRecording) {
@@ -128,6 +103,7 @@ function Moment() {
             setIsRecording(true);
             const data = await videoRecordPromise;
             const source = data.uri;
+            setVideo(source);
           }
 
           // animateProgressBar();
@@ -144,7 +120,7 @@ function Moment() {
   };
 
   const onGalleryPress = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
+    const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ImagePicker.MediaTypeOptions.Videos,
       allowsEditing: true,
       aspect: [16, 9],
@@ -152,23 +128,15 @@ function Moment() {
     });
 
     if (!result.canceled) {
-      // TODO:  pass video uri into save component
+      setVideo(result.assets[0].uri);
     }
   };
 
   const cancelMedia = () => {
-    // setVideo(null);
+    setVideo(null);
   };
 
-  const handleVideoPlayerRef = (ref) => {
-    // this.video = ref;
-    // if (this.video) {
-    // }
-  };
   /*
-  handleRecordButtonRef(ref) {
-    this.recordButton = ref;
-  }
   updateProgressText(progressText) {
     this.setState({ progressText });
   }
@@ -196,9 +164,17 @@ function Moment() {
     }
   }
 */
-  const toggleCameraType = () => {
+  const toggleCameraDirection = () => {
     setCameraDirection((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back,
+    );
+  };
+
+  const toggleFlashlight = () => {
+    setCameraFlash((current) =>
+      current === Camera.Constants.FlashMode.off
+        ? Camera.Constants.FlashMode.torch
+        : Camera.Constants.FlashMode.off,
     );
   };
 
@@ -206,15 +182,17 @@ function Moment() {
 
   return (
     <View style={styles.container}>
-      <Camera
-        style={styles.camera}
-        type={cameraDirection}
-        flashMode={cameraFlash}
-        onCameraReady={() => setCameraReady(true)}
-        ref={camera}
-        ratio={"16:9"}
-      />
-      {/* <ProgressBar
+      {!video && (
+        <>
+          <Camera
+            style={styles.camera}
+            type={cameraDirection}
+            flashMode={cameraFlash}
+            onCameraReady={() => setCameraReady(true)}
+            ref={camera}
+            ratio={"16:9"}
+          />
+          {/* <ProgressBar
         video={video}
         isRecording={isRecording}
         animationStyle={this.animationStyle()}
@@ -222,20 +200,19 @@ function Moment() {
         cancelMedia={this.cancelMedia}
         videoIsLoading={videoIsLoading}
       /> */}
-      {isCameraReady && (
-        <CameraOverlay
-          onToggleRecord={onToggleRecord}
-          onGalleryPress={onGalleryPress}
-          video={video}
-          isRecording={isRecording}
-          gallery={galleryItems}
-        />
+          {isCameraReady && (
+            <CameraOverlay
+              onToggleRecord={onToggleRecord}
+              onGalleryPress={onGalleryPress}
+              isRecording={isRecording}
+              gallery={galleryItems}
+              onToggleCameraDirection={toggleCameraDirection}
+              onToggleFlashlight={toggleFlashlight}
+            />
+          )}
+        </>
       )}
-      {/* <Preview
-        video={video}
-        handleVideoRef={this.handleVideoPlayerRef}
-        onPlaybackStatusUpdate={this.onPlaybackStatusUpdate}
-      /> */}
+      {video && <SaveVideo videoUri={video} cancelPublish={cancelMedia} />}
     </View>
   );
 }

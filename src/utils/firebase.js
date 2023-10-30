@@ -10,7 +10,14 @@ import {
   getReactNativePersistence,
   signOut,
 } from "firebase/auth";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  getDownloadURL,
+} from "firebase/storage";
 import { getFirestore, collection, addDoc } from "firebase/firestore";
+import uuid from "uuid-random";
 /*
 const firebaseUrl =
   "https://inthemoment-8bfdf-default-rtdb.europe-west1.firebasedatabase.app";
@@ -20,6 +27,7 @@ const API_KEY = Constants.expoConfig?.web?.config?.firebase?.apiKey;
 let app = null;
 let auth = null;
 let db = null;
+let storage = null;
 
 export function initFirebase() {
   app = initializeApp(Constants.expoConfig?.web?.config?.firebase);
@@ -27,6 +35,7 @@ export function initFirebase() {
     persistence: getReactNativePersistence(AsyncStorage),
   });
   db = getFirestore(app);
+  storage = getStorage(app);
 
   return auth;
 }
@@ -68,6 +77,68 @@ export async function loginUser(email, password) {
 
 export async function logoutUser() {
   signOut(auth);
+}
+
+export async function publishVideo(video, data) {
+  console.log(auth);
+  const videoId = uuid();
+
+  const metadata = {
+    contentType: "video/mp4",
+  };
+
+  const storageRef = ref(storage, `video/${auth.currentUser.uid}/${videoId}`);
+  const uploadTask = uploadBytesResumable(storageRef, video, metadata);
+
+  uploadTask.on(
+    "state_changed",
+    (snapshot) => {
+      // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
+      const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+      console.log("Upload is " + progress + "% done");
+      switch (snapshot.state) {
+        case "paused":
+          console.log("Upload is paused");
+          break;
+        case "running":
+          console.log("Upload is running");
+          break;
+      }
+    },
+    (error) => {
+      // A full list of error codes is available at
+      // https://firebase.google.com/docs/storage/web/handle-errors
+      switch (error.code) {
+        case "storage/unauthorized":
+          // User doesn't have permission to access the object
+          break;
+        case "storage/canceled":
+          // User canceled the upload
+          break;
+
+        // ...
+
+        case "storage/unknown":
+          // Unknown error occurred, inspect error.serverResponse
+          break;
+      }
+    },
+    () => {
+      // Upload completed successfully, now we can get the download URL
+      getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+        console.log("File available at", downloadURL);
+        //Add to firestore
+        await addDoc(collection(db, "video"), {
+          owner: auth.currentUser.uid,
+          videoUrl: downloadURL,
+          description: "",
+          likes: 0,
+          comments: 0,
+          createAt: 0,
+        });
+      });
+    },
+  );
 }
 
 /*
