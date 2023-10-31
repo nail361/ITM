@@ -1,30 +1,34 @@
+import { Entypo, Fontisto } from "@expo/vector-icons";
 import Constants from "expo-constants";
+import * as Location from "expo-location";
+import * as Linking from "expo-linking";
 import { useCallback, useEffect, useState } from "react";
 import { Provider } from "react-redux";
-import { Entypo, Fontisto } from "@expo/vector-icons";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import * as SplashScreen from "expo-splash-screen";
 import { useFonts } from "expo-font";
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, View, SafeAreaView, Dimensions } from "react-native";
+import { StyleSheet, View, Text, Dimensions } from "react-native";
 
+import Auth from "./src/screens/auth";
 import Globe from "./src/screens/globe";
 import Local from "./src/screens/local";
 import Moment from "./src/screens/moment";
 import Profile from "./src/screens/profile";
-import Auth from "./src/screens/auth";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
 import { initFirebase } from "./src/utils/firebase";
+import CustomButton from "./src/components/ui/button";
+import { Colors } from "./src/utils/colors";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-SplashScreen.preventAutoHideAsync();
+// SplashScreen.preventAutoHideAsync();
 
 // const firebaseConfig = Constants.expoConfig?.web?.config?.firebase;
 /*
@@ -40,6 +44,7 @@ if (!firebaseConfig) {
 */
 export default function App() {
   const [isAuth, setAuth] = useState(store.getState().auth.isAuth);
+  const [locationGranted, setLocationGranted] = useState(false);
   let prevValue = isAuth;
 
   function handleStoreChange() {
@@ -55,6 +60,8 @@ export default function App() {
   useEffect(() => {
     store.dispatch(checkAuth());
     initFirebase();
+
+    onGiveLoacation();
 
     return () => {
       unsubscribe();
@@ -73,6 +80,29 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
+  async function onGiveLoacation() {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status === "granted") {
+      setLocationGranted(true);
+    } else setLocationGranted(false);
+
+    return status;
+  }
+
+  function openSettings() {
+    Linking.openSettings();
+  }
+
+  if (!locationGranted) {
+    return (
+      <View onLayout={onLayoutRootView} style={styles.container}>
+        <Text>You cannot use the application without a location</Text>
+        <CustomButton onPress={openSettings}>Give a permission</CustomButton>
+        <StatusBar style="auto" />
+      </View>
+    );
+  }
+
   if (!fontsLoaded) {
     return null;
   }
@@ -84,7 +114,7 @@ export default function App() {
       <Tab.Navigator
         initialRouteName="Globe"
         screenOptions={{
-          tabBarActiveTintColor: "blue",
+          tabBarActiveTintColor: Colors.mainTextColor,
         }}
       >
         <Tab.Screen

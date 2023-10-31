@@ -16,7 +16,12 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
-import { getFirestore, collection, addDoc } from "firebase/firestore";
+import {
+  getFirestore,
+  Timestamp,
+  collection,
+  addDoc,
+} from "firebase/firestore";
 import uuid from "uuid-random";
 /*
 const firebaseUrl =
@@ -30,6 +35,8 @@ let db = null;
 let storage = null;
 
 export function initFirebase() {
+  if (app != null) return;
+
   app = initializeApp(Constants.expoConfig?.web?.config?.firebase);
   auth = initializeAuth(app, {
     persistence: getReactNativePersistence(AsyncStorage),
@@ -38,6 +45,10 @@ export function initFirebase() {
   storage = getStorage(app);
 
   return auth;
+}
+
+export function getServetTime() {
+  return Timestamp.now().seconds;
 }
 
 export async function createUser(email, password) {
@@ -79,8 +90,7 @@ export async function logoutUser() {
   signOut(auth);
 }
 
-export async function publishVideo(video, data) {
-  console.log(auth);
+export async function publishVideo(video, data, callback) {
   const videoId = uuid();
 
   const metadata = {
@@ -95,7 +105,8 @@ export async function publishVideo(video, data) {
     (snapshot) => {
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
       const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-      console.log("Upload is " + progress + "% done");
+      callback(progress);
+      /*
       switch (snapshot.state) {
         case "paused":
           console.log("Upload is paused");
@@ -103,7 +114,10 @@ export async function publishVideo(video, data) {
         case "running":
           console.log("Upload is running");
           break;
-      }
+        case "success": {
+          console.log("Upload success");
+        }
+      }*/
     },
     (error) => {
       // A full list of error codes is available at
@@ -126,15 +140,19 @@ export async function publishVideo(video, data) {
     () => {
       // Upload completed successfully, now we can get the download URL
       getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
-        console.log("File available at", downloadURL);
         //Add to firestore
+        const timestamp = getServetTime();
         await addDoc(collection(db, "video"), {
           owner: auth.currentUser.uid,
           videoUrl: downloadURL,
-          description: "",
+          description: data.description,
+          location: data.location,
+          lifetime: data.lifetime,
+          privacy: data.privacy,
           likes: 0,
-          comments: 0,
-          createAt: 0,
+          dislikes: 0,
+          createAt: timestamp,
+          expireAt: timestamp + data.lifetime * 3600,
         });
       });
     },

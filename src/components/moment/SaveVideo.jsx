@@ -1,14 +1,19 @@
+import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Pressable, TextInput } from "react-native";
 import { Video, ResizeMode } from "expo-av";
 import CustomButton from "../ui/button";
 import { Colors } from "../../utils/colors";
 import { publishVideo } from "../../utils/firebase";
-import axios from "axios";
+import UploadProgress from "./UploadProgress";
 
 export default function SaveVideo(props) {
   const [status, setStatus] = useState({});
+  const [isUploading, setUploading] = useState(false);
+  const [uploadingProgress, setUploadingProgress] = useState(0);
   const [videoDescription, setDesctiption] = useState("");
+  const [videoPrivacy, setPrivacy] = useState("public");
+  const [videoLifetime, setLifetime] = useState(60);
   const video = useRef(null);
   const { videoUri, cancelPublish } = props;
 
@@ -16,10 +21,40 @@ export default function SaveVideo(props) {
     video.current.playAsync();
   }, []);
 
-  function onPublish() {
+  async function onPublish() {
+    const location = await Location.getCurrentPositionAsync();
+    const data = {
+      location: {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      },
+      description: videoDescription,
+      lifetime: videoLifetime,
+      privacy: videoPrivacy,
+    };
+
     fetch(videoUri)
       .then((response) => response.blob())
-      .then((blob) => publishVideo(blob));
+      .then((blob) => {
+        setUploading(true);
+        publishVideo(blob, data, onUploadProgress);
+      });
+  }
+
+  function onUploadProgress(progress) {
+    setUploadingProgress(progress);
+    if (progress === 100) {
+      setUploading(false);
+      cancelPublish();
+    }
+  }
+
+  if (isUploading) {
+    return (
+      <View style={styles.container}>
+        <UploadProgress progress={uploadingProgress} />
+      </View>
+    );
   }
 
   return (
