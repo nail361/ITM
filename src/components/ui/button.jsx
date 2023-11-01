@@ -6,7 +6,11 @@ export default function CustomButton(props) {
     <Pressable
       android_ripple={{ color: Colors.lightTextColor, foreground: true }}
       onPress={props.onPress}
-      style={[styles.button, props.disabled ? styles.disabled : null]}
+      style={[
+        styles.button,
+        props.style || null,
+        props.disabled ? styles.disabled : null,
+      ]}
     >
       <Text style={styles.text}>{props.children}</Text>
     </Pressable>
@@ -20,6 +24,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     textAlign: "center",
     alignItems: "center",
+    borderRadius: 15,
     backgroundColor: Colors.headerTextColor,
   },
   disabled: {

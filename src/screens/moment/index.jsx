@@ -11,7 +11,7 @@ import CameraOverlay from "../../components/moment/Overlay";
 import SaveVideo from "../../components/moment/SaveVideo";
 import ProgressBar from "../../components/moment/ProgressBar";
 
-const VIDEO_MAX_DURATION = 6; //sec
+const VIDEO_MAX_DURATION = 60; //sec
 
 function Moment() {
   const camera = useRef(null);
