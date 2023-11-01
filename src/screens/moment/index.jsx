@@ -1,25 +1,23 @@
 import { useIsFocused } from "@react-navigation/core";
 import { Audio } from "expo-av";
+import { Camera, CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
-import { Camera, CameraType } from "expo-camera";
 import { useState, useRef, useEffect } from "react";
-import { Text, Animated, View, LayoutAnimation } from "react-native";
-import styles from "./styles";
+import { Text, View } from "react-native";
 
-// import ProgressBar from "../components/ProgressBar";
+import styles from "./styles";
 import CameraOverlay from "../../components/moment/Overlay";
 import SaveVideo from "../../components/moment/SaveVideo";
+import ProgressBar from "../../components/moment/ProgressBar";
 
-const VIDEO_MAX_DURATION = 60000;
+const VIDEO_MAX_DURATION = 6; //sec
 
 function Moment() {
   const camera = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const [video, setVideo] = useState();
   const [galleryItems, setGalleryItems] = useState([]);
-  const [videoIsLoading, setVideoIsLoading] = useState(false);
-  const [progress, setProgress] = useState(VIDEO_MAX_DURATION / 1000);
   const [cameraDirection, setCameraDirection] = useState(CameraType.back);
   const [cameraFlash, setCameraFlash] = useState(
     Camera.Constants.FlashMode.off,
@@ -62,33 +60,6 @@ function Moment() {
     );
   }
 
-  const progressAnimation = new Animated.Value(0);
-
-  const progressTranslateX = progressAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: ["-200%", "0%"],
-  });
-
-  const progressFlex = progressAnimation.interpolate({
-    inputRange: [0, 1],
-    outputRange: [0, 1],
-  });
-
-  const progressBackgroundColor = progressAnimation.interpolate({
-    inputRange: [0, 0.2, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
-    outputRange: [
-      "#ff470f",
-      "#ff3860",
-      "#b86bff",
-      "#2196f3",
-      "#b86bff",
-      "#ff7600",
-      "#3273dc",
-      "red",
-      "#FF5F14",
-    ],
-  });
-
   const onToggleRecord = async () => {
     if (camera.current) {
       if (!isRecording) {
@@ -105,18 +76,18 @@ function Moment() {
             const source = data.uri;
             setVideo(source);
           }
-
-          // animateProgressBar();
-          // startCountdown();
-          // LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut);
         } catch (error) {
           console.warn(error);
         }
       } else {
-        camera.current.stopRecording();
-        setIsRecording(false);
+        stopRecording();
       }
     }
+  };
+
+  const stopRecording = () => {
+    camera.current.stopRecording();
+    setIsRecording(false);
   };
 
   const onGalleryPress = async () => {
@@ -136,34 +107,6 @@ function Moment() {
     setVideo(null);
   };
 
-  /*
-  updateProgressText(progressText) {
-    this.setState({ progressText });
-  }
-  startCountdown() {
-    const endDate = Date.now() + VIDEO_DURATION;
-    this.setState({ progressText: VIDEO_DURATION / 1000 }, () => countdown(endDate, this.updateProgressText));
-  }
-  animateProgressBar() {
-    this.progressAnimation.setValue(0);
-    Animated.timing(this.progressAnimation, {
-      toValue: 1,
-      useNativeDriver: false,
-      easing: Easing.linear,
-      duration: VIDEO_DURATION
-    }).start();
-  }
-  animationStyle() {
-    const { progressFlex: flex, progressBackgroundColor: backgroundColor } = this;
-    return {
-      flex,
-      // transform: [
-      //   { translateX }
-      // ],
-      backgroundColor
-    }
-  }
-*/
   const toggleCameraDirection = () => {
     setCameraDirection((current) =>
       current === CameraType.back ? CameraType.front : CameraType.back,
@@ -192,14 +135,11 @@ function Moment() {
             ref={camera}
             ratio={"16:9"}
           />
-          {/* <ProgressBar
-        video={video}
-        isRecording={isRecording}
-        animationStyle={this.animationStyle()}
-        progressText={progressText}
-        cancelMedia={this.cancelMedia}
-        videoIsLoading={videoIsLoading}
-      /> */}
+          <ProgressBar
+            maxDuration={VIDEO_MAX_DURATION}
+            isRecording={isRecording}
+            onEndEvent={stopRecording}
+          />
           {isCameraReady && (
             <CameraOverlay
               onToggleRecord={onToggleRecord}

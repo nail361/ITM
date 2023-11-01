@@ -1,11 +1,12 @@
+import { Video, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
 import { View, StyleSheet, Pressable, TextInput } from "react-native";
-import { Video, ResizeMode } from "expo-av";
-import CustomButton from "../ui/button";
+
+import UploadProgress from "./UploadProgress";
 import { Colors } from "../../utils/colors";
 import { publishVideo } from "../../utils/firebase";
-import UploadProgress from "./UploadProgress";
+import CustomButton from "../ui/button";
 
 export default function SaveVideo(props) {
   const [status, setStatus] = useState({});
