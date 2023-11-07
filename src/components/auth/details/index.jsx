@@ -38,8 +38,11 @@ export default function AuthDetails(props) {
       dispatch(
         authActions.login({
           token: response._tokenResponse.idToken,
-          email: response._tokenResponse.email,
-          uid: response._tokenResponse.localId,
+          email: response.user.email,
+          uid: response.user.uid,
+          createdAt: response.user.createdAt,
+          displayName: response.user.displayName,
+          photo: response.user.photoURL,
         }),
       );
       navigation.replace("Main");
@@ -53,12 +56,14 @@ export default function AuthDetails(props) {
     setLoading(true);
     try {
       const response = await loginUser(email, password);
-      console.log(response);
       dispatch(
         authActions.login({
           token: response._tokenResponse.idToken,
-          email: response._tokenResponse.email,
-          uid: response._tokenResponse.uid,
+          email: response.user.email,
+          uid: response.user.uid,
+          createdAt: response.user.createdAt,
+          displayName: response.user.displayName,
+          photo: response.user.photoURL,
         }),
       );
       navigation.replace("Main");

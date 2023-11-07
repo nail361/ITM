@@ -1,10 +1,15 @@
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { ActivityIndicator, MD2Colors } from "react-native-paper";
 import { Colors } from "../../utils/colors";
 
 export default function Loading(props) {
   return (
     <View style={styles.loading}>
-      <Text style={styles.text}>Loading...</Text>
+      <ActivityIndicator
+        size="large"
+        animating={true}
+        color={Colors.mainColor}
+      />
     </View>
   );
 }
@@ -17,12 +22,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     textAlign: "center",
     alignItems: "center",
-    backgroundColor: Colors.mainColor,
-  },
-  text: {
-    fontFamily: "ubuntu",
-    fontSize: 34,
-    textAlign: "center",
-    color: Colors.headerTextColor,
+    backgroundColor: "white",
   },
 });

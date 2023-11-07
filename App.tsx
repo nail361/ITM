@@ -1,29 +1,32 @@
 import { Entypo, Fontisto } from "@expo/vector-icons";
-import Constants from "expo-constants";
-import * as Location from "expo-location";
-import * as Linking from "expo-linking";
-import { useCallback, useEffect, useState } from "react";
-import { Provider } from "react-redux";
-import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import * as SplashScreen from "expo-splash-screen";
+import Constants from "expo-constants";
 import { useFonts } from "expo-font";
+import * as Linking from "expo-linking";
+import * as Location from "expo-location";
+import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import { useCallback, useEffect, useState } from "react";
 import { StyleSheet, View, Text, Dimensions } from "react-native";
+import {
+  MD3LightTheme as DefaultTheme,
+  PaperProvider,
+} from "react-native-paper";
+import { Provider } from "react-redux";
 
+import CustomButton from "./src/components/ui/button";
 import Auth from "./src/screens/auth";
 import Globe from "./src/screens/globe";
 import Local from "./src/screens/local";
 import Moment from "./src/screens/moment";
 import Profile from "./src/screens/profile";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
-import { initFirebase } from "./src/utils/firebase";
-import CustomButton from "./src/components/ui/button";
 import { Colors } from "./src/utils/colors";
+import { initFirebase } from "./src/utils/firebase";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -161,23 +164,37 @@ export default function App() {
     );
   }
 
+  const theme = {
+    ...DefaultTheme,
+    colors: {
+      ...DefaultTheme.colors,
+      primary: Colors.mainColor,
+      secondary: Colors.secondColor,
+    },
+    // fonts: {
+    //   fontFamily: "ubintu",
+    // },
+  };
+
   return (
     <Provider store={store}>
-      <View onLayout={onLayoutRootView} style={styles.mainView}>
-        <NavigationContainer>
-          <Stack.Navigator
-            initialRouteName={isAuth ? "Main" : "Auth"}
-            screenOptions={{
-              headerBackVisible: false,
-              headerShown: false,
-            }}
-          >
-            <Stack.Screen name="Auth" component={Auth} />
-            <Stack.Screen name="Main" component={Tabs} />
-          </Stack.Navigator>
-        </NavigationContainer>
-        <StatusBar style="auto" />
-      </View>
+      <PaperProvider theme={theme}>
+        <View onLayout={onLayoutRootView} style={styles.mainView}>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName={isAuth ? "Main" : "Auth"}
+              screenOptions={{
+                headerBackVisible: false,
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="Auth" component={Auth} />
+              <Stack.Screen name="Main" component={Tabs} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <StatusBar style="auto" />
+        </View>
+      </PaperProvider>
     </Provider>
   );
 }

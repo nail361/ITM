@@ -1,8 +1,10 @@
 import Slider from "@react-native-community/slider";
 import { Video, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
+import * as VideoThumbnails from "expo-video-thumbnails";
 import { useEffect, useState, useRef } from "react";
 import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
+import { SegmentedButtons } from "react-native-paper";
 
 import UploadProgress from "./UploadProgress";
 import { Colors } from "../../utils/colors";
@@ -23,8 +25,24 @@ export default function SaveVideo(props) {
     video.current.playAsync();
   }, []);
 
+  const generateThumbnail = async (source) => {
+    try {
+      const { uri } = await VideoThumbnails.getThumbnailAsync(source, {
+        time: 3000,
+        quality: 0.3,
+      });
+      return uri;
+    } catch (e) {
+      console.warn(e);
+    }
+  };
+
   async function onPublish() {
-    const location = await Location.getCurrentPositionAsync();
+    setUploading(true);
+    let location = await Location.getLastKnownPositionAsync();
+    if (location == null) location = await Location.getCurrentPositionAsync();
+
+    const thumbnail = await generateThumbnail(videoUri);
     const data = {
       location: {
         latitude: location.coords.latitude,
@@ -35,11 +53,16 @@ export default function SaveVideo(props) {
       privacy: videoPrivacy,
     };
 
+    const thumbnailBlob = await fetch(thumbnail)
+      .then((response) => response.blob())
+      .then((blob) => {
+        return blob;
+      });
+
     fetch(videoUri)
       .then((response) => response.blob())
       .then((blob) => {
-        setUploading(true);
-        publishVideo(blob, data, onUploadProgress);
+        publishVideo(blob, thumbnailBlob, data, onUploadProgress);
       });
   }
 
@@ -92,32 +115,27 @@ export default function SaveVideo(props) {
           onChangeText={(text) => setDesctiption(text)}
         />
         <View style={styles.privacyWrapper}>
-          <Text style={styles.text}>Privacy</Text>
-          <CustomButton
-            onPress={() => setPrivacy("public")}
-            style={[
-              styles.privacyBtn,
-              videoPrivacy === "public" ? styles.selected : null,
+          <SegmentedButtons
+            value={videoPrivacy}
+            onValueChange={setPrivacy}
+            buttons={[
+              {
+                value: "public",
+                label: "PUBLIC",
+              },
+              {
+                value: "private",
+                label: "PRIVATE",
+              },
             ]}
-          >
-            PUBLIC
-          </CustomButton>
-          <CustomButton
-            onPress={() => setPrivacy("private")}
-            style={[
-              styles.privacyBtn,
-              videoPrivacy === "private" ? styles.selected : null,
-            ]}
-          >
-            PRIVATE
-          </CustomButton>
+          />
         </View>
         <View style={styles.lifetimeWrapper}>
           <Text style={styles.text}>Lifetime</Text>
           <View style={styles.sliderTitles}>
-            <Text style={styles.sliderTitle}>15s</Text>
-            <Text style={styles.sliderTitle}>30s</Text>
-            <Text style={styles.sliderTitle}>45s</Text>
+            <Text style={styles.sliderTitle}>15m</Text>
+            <Text style={styles.sliderTitle}>30m</Text>
+            <Text style={styles.sliderTitle}>45m</Text>
             <Text style={styles.sliderTitle}>1h</Text>
           </View>
           <Slider
@@ -190,10 +208,6 @@ const styles = StyleSheet.create({
     fontFamily: "ubuntu",
     color: "white",
     fontSize: 18,
-  },
-  privacyBtn: {
-    width: 80,
-    marginLeft: 20,
   },
   selected: {
     borderWidth: 5,

@@ -1,37 +1,14 @@
-import { StyleSheet, Pressable, Text } from "react-native";
-import { Colors } from "../../utils/colors";
+import { Button } from "react-native-paper";
 
 export default function CustomButton(props) {
   return (
-    <Pressable
-      android_ripple={{ color: Colors.lightTextColor, foreground: true }}
+    <Button
       onPress={props.onPress}
-      style={[
-        styles.button,
-        props.style || null,
-        props.disabled ? styles.disabled : null,
-      ]}
+      disabled={props.disabled || false}
+      style={props.style || null}
+      mode={props.mode || "contained"}
     >
-      <Text style={styles.text}>{props.children}</Text>
-    </Pressable>
+      {props.children}
+    </Button>
   );
 }
-
-const styles = StyleSheet.create({
-  button: {
-    height: 50,
-    padding: 10,
-    justifyContent: "center",
-    textAlign: "center",
-    alignItems: "center",
-    borderRadius: 15,
-    backgroundColor: Colors.headerTextColor,
-  },
-  disabled: {
-    pointerEvents: "none",
-    backgroundColor: Colors.lightTextColor,
-  },
-  text: {
-    color: "white",
-  },
-});

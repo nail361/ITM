@@ -3,24 +3,30 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 interface storeProps {
   isAuth: boolean;
-  email: string;
-  uid: string;
   token: string;
+  uid: string;
+  email: string;
+  createdAt: string;
+  displayName: string;
+  photo: string;
 }
 
 const initialState: storeProps = {
   isAuth: false,
-  email: "",
-  uid: "",
   token: "",
+  uid: "",
+  email: "",
+  createdAt: "",
+  displayName: "",
+  photo: "",
 };
 
-const storageItemKey = "token";
+const storageItemKey = "auth";
 
 export const checkAuth = createAsyncThunk("checkAuth", async () => {
-  const storedToken = await AsyncStorage.getItem(storageItemKey);
-  if (storedToken !== null) {
-    return storedToken;
+  const storedData = await AsyncStorage.getItem(storageItemKey);
+  if (storedData !== null) {
+    return JSON.parse(storedData);
   }
   return "";
 });
@@ -34,20 +40,40 @@ const slice = createSlice({
       state.token = action.payload.token;
       state.email = action.payload.email;
       state.uid = action.payload.uid;
-      AsyncStorage.setItem(storageItemKey, action.payload.token);
+      state.createdAt = action.payload.createdAt;
+      state.displayName = action.payload.displayName;
+      state.photo = action.payload.photo;
+      AsyncStorage.setItem(
+        storageItemKey,
+        JSON.stringify({
+          token: action.payload.token,
+          uid: action.payload.uid,
+          email: action.payload.email,
+          displayName: action.payload.displayName,
+          photo: action.payload.photo,
+        }),
+      );
     },
     logout(state) {
       state.isAuth = false;
       state.token = "";
       state.email = "";
       state.uid = "";
+      state.createdAt = "";
+      state.displayName = "";
+      state.photo = "";
       AsyncStorage.removeItem(storageItemKey);
     },
   },
   extraReducers: (builder) => {
     builder.addCase(checkAuth.fulfilled, (state, action) => {
       state.isAuth = action.payload !== "";
-      state.token = action.payload;
+      state.token = action.payload.token;
+      state.email = action.payload.email;
+      state.uid = action.payload.uid;
+      state.createdAt = action.payload.createdAt;
+      state.displayName = action.payload.displayName;
+      state.photo = action.payload.photo;
     });
   },
 });

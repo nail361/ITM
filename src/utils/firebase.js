@@ -1,7 +1,5 @@
-import axios from "axios";
-import Constants from "expo-constants";
-import { Alert } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Constants from "expo-constants";
 import { initializeApp } from "firebase/app";
 import {
   initializeAuth,
@@ -11,17 +9,24 @@ import {
   signOut,
 } from "firebase/auth";
 import {
-  getStorage,
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
-import {
   getFirestore,
   Timestamp,
   collection,
   addDoc,
+  getDoc,
+  getDocs,
+  doc,
+  query,
+  where,
 } from "firebase/firestore";
+import {
+  getStorage,
+  ref,
+  uploadBytesResumable,
+  uploadBytes,
+  getDownloadURL,
+} from "firebase/storage";
+import { Alert } from "react-native";
 import uuid from "uuid-random";
 /*
 const firebaseUrl =
@@ -56,10 +61,15 @@ export async function createUser(email, password) {
     .then(async (userCredential) => {
       // Signed up
       const user = userCredential.user;
+      console.log("USER");
+      console.log(user);
       try {
         const docRef = await addDoc(collection(db, "users"), {
           uid: user.uid,
           email: user.email,
+          createdAt: user.createdAt || getServetTime(),
+          displayName: user.displayName || "",
+          photo: user.photoURL || "",
         });
         console.log("Document written with ID: ", docRef.id);
         return userCredential;
@@ -77,7 +87,6 @@ export async function loginUser(email, password) {
   return await signInWithEmailAndPassword(auth, email, password)
     .then((userCredential) => {
       // Signed in
-      const user = userCredential.user;
       return userCredential;
     })
     .catch((error) => {
@@ -90,17 +99,39 @@ export async function logoutUser() {
   signOut(auth);
 }
 
-export async function publishVideo(video, data, callback) {
-  const videoId = uuid();
+export async function publishVideo(video, thumbnail, data, callback) {
+  const uniqId = uuid();
 
+  const thumbnailURL = await uploadThumbnail(uniqId, thumbnail);
+
+  await uploadVideo(uniqId, video, thumbnailURL, data, callback);
+}
+
+async function uploadThumbnail(id, thumbnail) {
+  const metadata = {
+    contentType: "image/jpg",
+  };
+
+  const thumbnailRef = ref(storage, `thumbnail/${auth.currentUser.uid}/${id}`);
+
+  return await uploadBytes(thumbnailRef, thumbnail, metadata).then(
+    async (snapshot) =>
+      await getDownloadURL(snapshot.ref).then(async (downloadURL) => {
+        return downloadURL;
+      }),
+  );
+}
+
+async function uploadVideo(id, video, thumbnail, data, callback) {
   const metadata = {
     contentType: "video/mp4",
   };
 
-  const storageRef = ref(storage, `video/${auth.currentUser.uid}/${videoId}`);
-  const uploadTask = uploadBytesResumable(storageRef, video, metadata);
+  const storageRef = ref(storage, `video/${auth.currentUser.uid}/${id}`);
 
-  uploadTask.on(
+  const uploadVideo = uploadBytesResumable(storageRef, video, metadata);
+
+  uploadVideo.on(
     "state_changed",
     (snapshot) => {
       // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
@@ -139,7 +170,7 @@ export async function publishVideo(video, data, callback) {
     },
     () => {
       // Upload completed successfully, now we can get the download URL
-      getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+      getDownloadURL(uploadVideo.snapshot.ref).then(async (downloadURL) => {
         //Add to firestore
         const timestamp = getServetTime();
         await addDoc(collection(db, "video"), {
@@ -149,14 +180,38 @@ export async function publishVideo(video, data, callback) {
           location: data.location,
           lifetime: data.lifetime,
           privacy: data.privacy,
+          thumbnail,
           likes: 0,
           dislikes: 0,
           createAt: timestamp,
-          expireAt: timestamp + data.lifetime * 3600,
+          expireAt: timestamp + data.lifetime * 60,
         });
       });
     },
   );
+}
+
+export async function getMyVideos() {
+  const _query = query(
+    collection(db, "video"),
+    where("owner", "==", auth.currentUser.uid),
+  );
+  const querySnapshot = await getDocs(_query);
+  const serverTime = getServetTime();
+
+  const response = [];
+  querySnapshot.forEach((doc) => {
+    const data = doc.data();
+
+    console.log(data.expireAt);
+    console.log(serverTime);
+
+    if (serverTime > data.expireAt) {
+      console.log("video dead");
+    } else response.push({ id: doc.id, serverTime, ...data });
+  });
+
+  return response;
 }
 
 /*
