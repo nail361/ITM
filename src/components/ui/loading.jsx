@@ -4,7 +4,7 @@ import { Colors } from "../../utils/colors";
 
 export default function Loading(props) {
   return (
-    <View style={styles.loading}>
+    <View style={[styles.loading, props.style || null]}>
       <ActivityIndicator
         size="large"
         animating={true}

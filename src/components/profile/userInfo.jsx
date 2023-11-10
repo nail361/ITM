@@ -2,9 +2,9 @@ import React from "react";
 import { StyleSheet, View } from "react-native";
 import { Avatar } from "react-native-paper";
 
-import CustomText from "../ui/text";
 import { Colors } from "../../utils/colors";
 import CustomButton from "../ui/button";
+import CustomText from "../ui/text";
 
 function Popularity(props) {
   const percent = 50;

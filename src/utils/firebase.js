@@ -13,7 +13,9 @@ import {
   Timestamp,
   collection,
   addDoc,
+  setDoc,
   getDoc,
+  deleteDoc,
   getDocs,
   doc,
   query,
@@ -25,21 +27,17 @@ import {
   uploadBytesResumable,
   uploadBytes,
   getDownloadURL,
+  deleteObject,
 } from "firebase/storage";
 import { Alert } from "react-native";
 import uuid from "uuid-random";
-/*
-const firebaseUrl =
-  "https://inthemoment-8bfdf-default-rtdb.europe-west1.firebasedatabase.app";
-const authUrl = "https://identitytoolkit.googleapis.com/v1/accounts:";
-const API_KEY = Constants.expoConfig?.web?.config?.firebase?.apiKey;
-*/
+
 let app = null;
 let auth = null;
 let db = null;
 let storage = null;
 
-export function initFirebase() {
+export function _init() {
   if (app != null) return;
 
   app = initializeApp(Constants.expoConfig?.web?.config?.firebase);
@@ -173,7 +171,7 @@ async function uploadVideo(id, video, thumbnail, data, callback) {
       getDownloadURL(uploadVideo.snapshot.ref).then(async (downloadURL) => {
         //Add to firestore
         const timestamp = getServetTime();
-        await addDoc(collection(db, "video"), {
+        await setDoc(doc(db, "video", id), {
           owner: auth.currentUser.uid,
           videoUrl: downloadURL,
           description: data.description,
@@ -200,107 +198,25 @@ export async function getMyVideos() {
   const serverTime = getServetTime();
 
   const response = [];
-  querySnapshot.forEach((doc) => {
-    const data = doc.data();
-
-    console.log(data.expireAt);
-    console.log(serverTime);
+  querySnapshot.forEach((document) => {
+    const data = document.data();
 
     if (serverTime > data.expireAt) {
-      console.log("video dead");
-    } else response.push({ id: doc.id, serverTime, ...data });
+      const videoRef = ref(
+        storage,
+        `video/${auth.currentUser.uid}/${document.id}`,
+      );
+      const thumbnailRef = ref(
+        storage,
+        `thumbnail/${auth.currentUser.uid}/${document.id}`,
+      );
+
+      deleteObject(videoRef);
+      deleteObject(thumbnailRef);
+
+      deleteDoc(doc(db, "video", document.id));
+    } else response.push({ id: document.id, serverTime, ...data });
   });
 
   return response;
 }
-
-/*
-export async function loginUser(email, password) {
-  const response = await axios
-    .post(`${authUrl}signInWithPassword?key=${API_KEY}`, {
-      email,
-      password,
-      returnSecureToken: true,
-    })
-    .catch((error) => {
-      let errorMsg = "Something went wrong, try later";
-      if (error.response) {
-        switch (error.response.data.error.message) {
-          case "INVALID_LOGIN_CREDENTIALS":
-            errorMsg =
-              "There is no user record corresponding to this identifier. The user may have been deleted.";
-            break;
-          case "EMAIL_NOT_FOUND":
-            errorMsg =
-              "There is no user record corresponding to this identifier. The user may have been deleted.";
-            break;
-          case "INVALID_PASSWORD":
-            errorMsg =
-              "The password is invalid or the user does not have a password";
-            break;
-          case "USER_DISABLED":
-            errorMsg = "The user account has been disabled by an administrator";
-            break;
-          case "TOO_MANY_ATTEMPTS_TRY_LATER":
-            errorMsg =
-              "Access to this account has been temporarily disabled due to many failed login attempts. You can immediately restore it by resetting your password or you can try again later";
-            break;
-          default:
-            errorMsg = error.response.data.error.message;
-            break;
-        }
-      }
-
-      Alert.alert("Failed to sign in", errorMsg);
-    });
-
-  return response;
-}
-
-export async function createUser(email, password) {
-  const response = await axios
-    .post(`${authUrl}signUp?key=${API_KEY}`, {
-      email,
-      password,
-      returnSecureToken: true,
-    })
-    .catch((error) => {
-      let errorMsg = "Something went wrong, try later";
-      if (error.response) {
-        switch (error.response.data.error.message) {
-          case "EMAIL_EXISTS":
-            errorMsg = "The email address is already in use by another account";
-            break;
-          case "OPERATION_NOT_ALLOWED":
-            errorMsg = "Password sign-in is disabled for this project";
-            break;
-          case "TOO_MANY_ATTEMPTS_TRY_LATER":
-            errorMsg =
-              "We have blocked all requests from this device due to unusual activity. Try again later";
-            break;
-          default:
-            errorMsg = error.response.data.error.message;
-            break;
-        }
-      }
-
-      Alert.alert("Failed to create new user!", errorMsg);
-    });
-
-  axios
-    .post(
-      `${firebaseUrl}\\users.json`,
-      { uid: response.data.localId, email: response.data.email },
-      {
-        headers: {
-          Authorization: `Basic ${response.data.idToken}`,
-        },
-      },
-    )
-    .catch((error) => {
-      console.log(error);
-    });
-
-  return response;
-}
-*/

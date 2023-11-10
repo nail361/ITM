@@ -8,7 +8,7 @@ import { SegmentedButtons } from "react-native-paper";
 
 import UploadProgress from "./UploadProgress";
 import { Colors } from "../../utils/colors";
-import { publishVideo } from "../../utils/firebase";
+import { publishVideo } from "../../utils/db";
 import CustomButton from "../ui/button";
 
 export default function SaveVideo(props) {
@@ -61,17 +61,15 @@ export default function SaveVideo(props) {
 
     fetch(videoUri)
       .then((response) => response.blob())
-      .then((blob) => {
-        publishVideo(blob, thumbnailBlob, data, onUploadProgress);
+      .then(async (blob) => {
+        await publishVideo(blob, thumbnailBlob, data, onUploadProgress);
+        setUploading(false);
+        cancelPublish();
       });
   }
 
   function onUploadProgress(progress) {
     setUploadingProgress(progress);
-    if (progress === 100) {
-      setUploading(false);
-      cancelPublish();
-    }
   }
 
   if (isUploading) {
@@ -201,7 +199,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     padding: 5,
     color: "black",
-    textAlignVertical: "top",
+    verticalAlign: "top",
     backgroundColor: Colors.lightTextColor,
   },
   text: {

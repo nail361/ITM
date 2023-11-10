@@ -1,17 +1,19 @@
+import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { View, Text, Pressable, Alert } from "react-native";
 import { useDispatch } from "react-redux";
-import { authActions } from "../../../store/auth";
-import { View, Text, TextInput, Pressable, Alert } from "react-native";
-import CustomButton from "../../ui/button";
 
 import styles from "./styles";
-import { createUser, loginUser } from "../../../utils/firebase";
+import { authActions } from "../../../store/auth";
+import { createUser, loginUser } from "../../../utils/db";
+import CustomButton from "../../ui/button";
 import Loading from "../../ui/loading";
-import { useNavigation } from "@react-navigation/native";
+import CustomTextInput from "../../ui/textInput";
 
 export default function AuthDetails(props) {
   const { route } = props;
   const navigation = useNavigation();
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [correctData, setCorrectData] = useState(false);
@@ -21,8 +23,15 @@ export default function AuthDetails(props) {
   const authPage = route.params.authPage;
 
   useEffect(() => {
-    if (email.length >= 3 && password.length >= 5) setCorrectData(true);
-    else setCorrectData(false);
+    let correct = false;
+
+    if (authPage === 0) {
+      correct = name.length > 3 && password.length >= 5;
+    } else {
+      correct = name.length > 3 && email.length > 3 && password.length > 5;
+    }
+
+    setCorrectData(correct);
   }, [email, password]);
 
   function onSubmit() {
@@ -33,62 +42,76 @@ export default function AuthDetails(props) {
 
   async function onCreateUser() {
     setLoading(true);
-    try {
-      const response = await createUser(email, password);
+    const response = await createUser(name, email, password);
+    console.log(response);
+
+    if (response.error) {
+      Alert.alert(response.error);
+    } else {
       dispatch(
         authActions.login({
-          token: response._tokenResponse.idToken,
-          email: response.user.email,
-          uid: response.user.uid,
-          createdAt: response.user.createdAt,
-          displayName: response.user.displayName,
-          photo: response.user.photoURL,
+          token: response.sessionToken,
+          email: response.email,
+          uid: response.objectId,
+          createdAt: new Date(response.createdAt).getTime() / 1000,
+          displayName: response.username,
+          photo: "",
         }),
       );
       navigation.replace("Main");
-    } catch (e) {
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   }
 
   async function onLoginUser() {
     setLoading(true);
-    try {
-      const response = await loginUser(email, password);
+    const response = await loginUser(name, password);
+    console.log(response);
+
+    if (response.error) {
+      Alert.alert(response.error);
+    } else {
       dispatch(
         authActions.login({
-          token: response._tokenResponse.idToken,
-          email: response.user.email,
-          uid: response.user.uid,
-          createdAt: response.user.createdAt,
-          displayName: response.user.displayName,
-          photo: response.user.photoURL,
+          token: response.sessionToken,
+          email: response.email,
+          uid: response.objectId,
+          createdAt: Math.ceil(new Date(response.createdAt).getTime() / 1000),
+          displayName: response.username,
+          photo: "",
         }),
       );
       navigation.replace("Main");
-    } catch (e) {
-    } finally {
-      setLoading(false);
     }
+
+    setLoading(false);
   }
 
   if (loading) return <Loading />;
 
   return (
     <View style={styles.container}>
-      <TextInput
-        onChangeText={(text) => setEmail(text)}
+      <CustomTextInput
+        onChangeText={(text) => setName(text)}
         style={styles.textIn}
-        placeholder="Email"
-        inputmode="email"
-        keyboardType="email-address"
-        value={email}
+        label="Name"
+        inputMode="text"
+        value={name}
       />
-      <TextInput
+      {authPage !== 0 && (
+        <CustomTextInput
+          onChangeText={(text) => setEmail(text)}
+          style={styles.textIn}
+          label="Email"
+          inputMode="email"
+          value={email}
+        />
+      )}
+      <CustomTextInput
         onChangeText={(text) => setPassword(text)}
         style={styles.textIn}
-        placeholder="Password"
+        label="Password"
         secureTextEntry={true}
         value={password}
       />

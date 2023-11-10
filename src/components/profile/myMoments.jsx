@@ -1,19 +1,41 @@
-import { useState, useEffect } from "react";
-import { View, StyleSheet, FlatList, Image } from "react-native";
+import { Entypo } from "@expo/vector-icons";
+import { Video as VideoPlayer, ResizeMode } from "expo-av";
+import { LinearGradient } from "expo-linear-gradient";
+import { useState, useEffect, useRef } from "react";
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  Pressable,
+  Alert,
+} from "react-native";
 
-import { getMyVideos } from "../../utils/firebase";
+import { Colors } from "../../utils/colors";
+import { getMyVideos, removeVideo } from "../../utils/db";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
 
-import { Entypo } from "@expo/vector-icons";
-import { Colors } from "../../utils/colors";
-
 function Video(props) {
-  const { thumbnail, createAt, lifetime, likes, dislikes } = props.data;
+  const { showPreview, onVideoRemove } = props;
+  const { id, videoUrl, thumbnailUrl, createdAt, lifetime, likes, dislikes } =
+    props.data;
 
   return (
-    <View style={styles.video}>
-      <Image style={styles.thumbnail} source={{ uri: thumbnail }} />
+    <TouchableOpacity
+      style={styles.video}
+      onPress={() => showPreview(videoUrl)}
+    >
+      <Image style={styles.thumbnail} source={{ uri: thumbnailUrl }} />
+      <Entypo style={styles.timer} name="stopwatch" size={20} color="white" />
+      <Pressable style={styles.removeBtn} onPress={() => onVideoRemove(id)}>
+        <Entypo name="cup" size={20} color="red" />
+      </Pressable>
+      <LinearGradient
+        colors={["transparent", "rgba(255,255,255,0.8)"]}
+        style={styles.videoLeftPanel}
+      />
       <View style={styles.likes}>
         <View style={styles.likeRow}>
           <Entypo name="thumbs-up" size={16} color="green" />
@@ -21,25 +43,50 @@ function Video(props) {
         </View>
         <View style={styles.likeRow}>
           <Entypo name="thumbs-down" size={16} color="red" />
-          <CustomText style={styles.dislikeText}>{likes}</CustomText>
+          <CustomText style={styles.dislikeText}>{dislikes}</CustomText>
         </View>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 }
 
 export default function MyMoments() {
   const [videos, setVideos] = useState([]);
+  const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [videoLoading, setVideoLoading] = useState(true);
+  const videoPlayer = useRef(null);
 
   useEffect(() => {
-    async function fetchVideos() {
-      const response = await getMyVideos();
-      setVideos(response);
-      setLoading(false);
-    }
     fetchVideos();
   }, []);
+
+  async function fetchVideos() {
+    const response = await getMyVideos();
+    setVideos(response);
+    setLoading(false);
+  }
+
+  function showPreview(url) {
+    setPreview(url);
+    setVideoLoading(true);
+  }
+
+  function videoLoaded() {
+    setVideoLoading(false);
+    videoPlayer.current.playAsync();
+  }
+
+  async function onVideoRemove(videoId) {
+    setLoading(true);
+
+    const response = await removeVideo(videoId);
+    if (response.error) {
+      Alert.alert(response.error);
+    }
+
+    fetchVideos();
+  }
 
   if (loading) {
     return (
@@ -51,13 +98,38 @@ export default function MyMoments() {
 
   return (
     <View style={styles.container}>
+      {preview && (
+        <Pressable
+          style={styles.videoPreviewWrapper}
+          onPress={() => setPreview(null)}
+        >
+          <VideoPlayer
+            ref={videoPlayer}
+            style={styles.videoPreview}
+            source={{
+              uri: preview,
+            }}
+            useNativeControls={false}
+            resizeMode={ResizeMode.CONTAIN}
+            isLooping
+            onLoad={videoLoaded}
+          />
+          {videoLoading && <Loading style={styles.videoLoading} />}
+        </Pressable>
+      )}
       <FlatList
         contentContainerStyle={styles.videos}
         numColumns={3}
         removeClippedSubviews
         data={videos}
         keyExtractor={(item) => item.id}
-        renderItem={({ item }) => <Video data={item} />}
+        renderItem={({ item }) => (
+          <Video
+            data={item}
+            showPreview={showPreview}
+            onVideoRemove={onVideoRemove}
+          />
+        )}
       ></FlatList>
     </View>
   );
@@ -107,5 +179,44 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "green",
     marginLeft: 5,
+  },
+  videoPreviewWrapper: {
+    position: "absolute",
+    left: 0,
+    top: 0,
+    width: "100%",
+    height: "100%",
+    backgroundColor: Colors.secondColor,
+    zIndex: 1,
+    padding: 10,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  videoPreview: {
+    width: "100%",
+    height: "100%",
+    position: "absolute",
+  },
+  videoLoading: {
+    backgroundColor: "transparent",
+    position: "absolute",
+  },
+  videoLeftPanel: {
+    width: "100%",
+    height: 60,
+    position: "absolute",
+    left: 0,
+    bottom: 0,
+  },
+  timer: {
+    position: "absolute",
+    top: 5,
+    left: 5,
+  },
+  removeBtn: {
+    position: "absolute",
+    top: 5,
+    right: 5,
+    opacity: 0.8,
   },
 });

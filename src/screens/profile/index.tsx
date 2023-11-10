@@ -1,7 +1,7 @@
 import { Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, Text, View, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
 import styles from "./styles";
@@ -11,6 +11,7 @@ import CustomButton from "../../components/ui/button";
 import { RootState } from "../../store";
 import { authActions } from "../../store/auth";
 import { Colors } from "../../utils/colors";
+import { logoutUser } from "../../utils/db";
 
 type TitleProps = {
   title: string;
@@ -45,10 +46,16 @@ function Profile() {
     photo,
   };
 
-  function onLogout() {
-    dispatch(authActions.logout());
-    //@ts-ignore
-    navigation.replace("Auth");
+  async function onLogout() {
+    const response = await logoutUser();
+
+    if (response === true) {
+      dispatch(authActions.logout());
+      //@ts-ignore
+      navigation.replace("Auth");
+    } else {
+      Alert.alert(response?.error);
+    }
   }
 
   return (

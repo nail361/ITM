@@ -33,6 +33,11 @@
           "messagingSenderId": "833474811521",
           "appId": "1:833474811521:web:38278abfebc750061e9f80",
           "measurementId": "G-MJWZNJWHEM"
+        },
+        "parse": {
+          "apiKey": "SVC3eU9sET",
+          "masterKey": "WMbiSFmmE6",
+          "domain": "http://212.109.199.35:1337/parse"
         }
       }
     },
@@ -40,7 +45,8 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera."
+          "cameraPermission": "Allow $(PRODUCT_NAME) to access your camera.",
+          "microphonePermission": "Allow $(PRODUCT_NAME) to access your microphone"
         }
       ],
       [

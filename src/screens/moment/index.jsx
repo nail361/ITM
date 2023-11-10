@@ -4,7 +4,7 @@ import { Camera, CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { useState, useRef, useEffect } from "react";
-import { Text, View } from "react-native";
+import { Text, View, Platform } from "react-native";
 
 import styles from "./styles";
 import CameraOverlay from "../../components/moment/Overlay";
@@ -30,6 +30,8 @@ function Moment() {
 
   const isFocused = useIsFocused();
 
+  let availableVideoCodecs = [];
+
   useEffect(() => {
     (async () => {
       const cameraStatus = await Camera.requestCameraPermissionsAsync();
@@ -49,6 +51,10 @@ function Moment() {
         });
         setGalleryItems(userGalleryMedia.assets);
       }
+
+      if (Platform.OS === "ios") {
+        availableVideoCodecs = await Camera.getAvailableVideoCodecsAsync();
+      }
     })();
   }, []);
 
@@ -65,9 +71,17 @@ function Moment() {
       if (!isRecording) {
         try {
           const options = {
-            maxDuration: VIDEO_MAX_DURATION / 1000,
-            quality: Camera.Constants.VideoQuality["480"],
+            maxDuration: VIDEO_MAX_DURATION,
+            quality: Camera.Constants.VideoQuality["480p"],
           };
+
+          /*
+          let curRatio = "16:9";
+          let availableRatios = [];
+          if (Platform.OS === "android") {
+            availableRatios = await camera.current.getSupportedRatiosAsync();
+            if (availableRatios.indexOf("16:9") == -1)
+          }*/
 
           const videoRecordPromise = camera.current.recordAsync(options);
           if (videoRecordPromise) {

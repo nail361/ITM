@@ -1,3 +1,4 @@
+import "react-native-get-random-values";
 import { Entypo, Fontisto } from "@expo/vector-icons";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { NavigationContainer } from "@react-navigation/native";
@@ -8,9 +9,8 @@ import * as Linking from "expo-linking";
 import * as Location from "expo-location";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View, Text, Dimensions } from "react-native";
+import { StyleSheet, View, Text } from "react-native";
 import {
   MD3LightTheme as DefaultTheme,
   PaperProvider,
@@ -26,25 +26,13 @@ import Profile from "./src/screens/profile";
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
 import { Colors } from "./src/utils/colors";
-import { initFirebase } from "./src/utils/firebase";
+import { init as initDB } from "./src/utils/db";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
 
-// SplashScreen.preventAutoHideAsync();
+SplashScreen.preventAutoHideAsync();
 
-// const firebaseConfig = Constants.expoConfig?.web?.config?.firebase;
-/*
-let app = null;
-let auth: any = null;
-
-if (!firebaseConfig) {
-  console.log("NO FIREBASE CONFIG!!!");
-} else {
-  app = initializeApp(firebaseConfig);
-  auth = getAuth(app);
-}
-*/
 export default function App() {
   const [isAuth, setAuth] = useState(store.getState().auth.isAuth);
   const [locationGranted, setLocationGranted] = useState(false);
@@ -62,9 +50,9 @@ export default function App() {
 
   useEffect(() => {
     store.dispatch(checkAuth());
-    initFirebase();
+    initDB();
 
-    onGiveLoacation();
+    onGiveLocation();
 
     return () => {
       unsubscribe();
@@ -83,7 +71,7 @@ export default function App() {
     }
   }, [fontsLoaded]);
 
-  async function onGiveLoacation() {
+  async function onGiveLocation() {
     const { status } = await Location.requestForegroundPermissionsAsync();
     if (status === "granted") {
       setLocationGranted(true);
@@ -109,8 +97,6 @@ export default function App() {
   if (!fontsLoaded) {
     return null;
   }
-
-  const devideWidth = Dimensions.get("window").width;
 
   function Tabs() {
     return (
