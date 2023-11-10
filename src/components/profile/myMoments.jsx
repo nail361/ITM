@@ -13,36 +13,40 @@ import {
 } from "react-native";
 
 import { Colors } from "../../utils/colors";
-import { getMyVideos, removeVideo } from "../../utils/db";
+import { getMyVideos, removeVideo, getServerTime } from "../../utils/db";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
 
 function Video(props) {
-  const { showPreview, onVideoRemove } = props;
-  const { id, videoUrl, thumbnailUrl, createdAt, lifetime, likes, dislikes } =
+  const { showPreview, serverTime } = props;
+  const { id, videoUrl, thumbnailUrl, expireAt, likes, dislikes, privacy } =
     props.data;
+
+  const max_with = 80;
+  let current_with = (max_with * (expireAt - serverTime)) / 3600;
+  current_with = Math.max(1, current_with);
+  current_with = Math.min(max_with, current_with);
 
   return (
     <TouchableOpacity
       style={styles.video}
-      onPress={() => showPreview(videoUrl)}
+      onPress={() => showPreview({ videoUrl, privacy, id })}
     >
       <Image style={styles.thumbnail} source={{ uri: thumbnailUrl }} />
       <Entypo style={styles.timer} name="stopwatch" size={20} color="white" />
-      <Pressable style={styles.removeBtn} onPress={() => onVideoRemove(id)}>
-        <Entypo name="cup" size={20} color="red" />
-      </Pressable>
+      <View style={[styles.timerProgress, { width: current_with }]} />
+      <View style={[styles.timerProgressBg, { width: max_with }]} />
       <LinearGradient
-        colors={["transparent", "rgba(255,255,255,0.8)"]}
+        colors={["transparent", "rgba(0,0,0,0.8)"]}
         style={styles.videoLeftPanel}
       />
       <View style={styles.likes}>
         <View style={styles.likeRow}>
-          <Entypo name="thumbs-up" size={16} color="green" />
+          <Entypo name="thumbs-up" size={16} color="white" />
           <CustomText style={styles.likeText}>{likes}</CustomText>
         </View>
         <View style={styles.likeRow}>
-          <Entypo name="thumbs-down" size={16} color="red" />
+          <Entypo name="thumbs-down" size={16} color="white" />
           <CustomText style={styles.dislikeText}>{dislikes}</CustomText>
         </View>
       </View>
@@ -56,6 +60,7 @@ export default function MyMoments() {
   const [loading, setLoading] = useState(true);
   const [videoLoading, setVideoLoading] = useState(true);
   const videoPlayer = useRef(null);
+  const [serverTime, setServerTime] = useState(0);
 
   useEffect(() => {
     fetchVideos();
@@ -64,6 +69,10 @@ export default function MyMoments() {
   async function fetchVideos() {
     const response = await getMyVideos();
     setVideos(response);
+
+    const serverTime = await getServerTime();
+    setServerTime(serverTime);
+
     setLoading(false);
   }
 
@@ -77,6 +86,15 @@ export default function MyMoments() {
     videoPlayer.current.playAsync();
   }
 
+  function onVideoRemoveConfirm(videoId) {
+    Alert.alert("Remove video", "Are you shure to remove video?", [
+      {
+        text: "Cancel",
+      },
+      { text: "OK", onPress: () => onVideoRemove(videoId) },
+    ]);
+  }
+
   async function onVideoRemove(videoId) {
     setLoading(true);
 
@@ -84,6 +102,8 @@ export default function MyMoments() {
     if (response.error) {
       Alert.alert(response.error);
     }
+
+    setPreview(null);
 
     fetchVideos();
   }
@@ -99,23 +119,41 @@ export default function MyMoments() {
   return (
     <View style={styles.container}>
       {preview && (
-        <Pressable
-          style={styles.videoPreviewWrapper}
-          onPress={() => setPreview(null)}
-        >
-          <VideoPlayer
-            ref={videoPlayer}
-            style={styles.videoPreview}
-            source={{
-              uri: preview,
-            }}
-            useNativeControls={false}
-            resizeMode={ResizeMode.CONTAIN}
-            isLooping
-            onLoad={videoLoaded}
-          />
-          {videoLoading && <Loading style={styles.videoLoading} />}
-        </Pressable>
+        <>
+          <View style={styles.privacy}>
+            <Entypo
+              name={preview.privacy === "private" ? "lock" : "lock-open"}
+              size={20}
+              color="white"
+            />
+            <CustomText style={styles.privacyText}>
+              {preview.privacy}
+            </CustomText>
+          </View>
+          <Pressable
+            style={styles.removeBtn}
+            onPress={() => onVideoRemoveConfirm(preview.id)}
+          >
+            <Entypo name="cup" size={35} color="white" />
+          </Pressable>
+          <Pressable
+            style={styles.videoPreviewWrapper}
+            onPress={() => setPreview(null)}
+          >
+            <VideoPlayer
+              ref={videoPlayer}
+              style={styles.videoPreview}
+              source={{
+                uri: preview.videoUrl,
+              }}
+              useNativeControls={false}
+              resizeMode={ResizeMode.CONTAIN}
+              isLooping
+              onLoad={videoLoaded}
+            />
+            {videoLoading && <Loading style={styles.videoLoading} />}
+          </Pressable>
+        </>
       )}
       <FlatList
         contentContainerStyle={styles.videos}
@@ -126,8 +164,8 @@ export default function MyMoments() {
         renderItem={({ item }) => (
           <Video
             data={item}
+            serverTime={serverTime}
             showPreview={showPreview}
-            onVideoRemove={onVideoRemove}
           />
         )}
       ></FlatList>
@@ -172,12 +210,12 @@ const styles = StyleSheet.create({
   },
   dislikeText: {
     fontSize: 16,
-    color: "red",
+    color: "white",
     marginLeft: 5,
   },
   likeText: {
     fontSize: 16,
-    color: "green",
+    color: "white",
     marginLeft: 5,
   },
   videoPreviewWrapper: {
@@ -213,10 +251,44 @@ const styles = StyleSheet.create({
     top: 5,
     left: 5,
   },
+  timerProgress: {
+    position: "absolute",
+    top: 15,
+    left: 30,
+    height: 5,
+    backgroundColor: "white",
+    borderRadius: 5,
+  },
+  timerProgressBg: {
+    position: "absolute",
+    top: 15,
+    left: 30,
+    height: 5,
+    borderColor: "#00000030",
+    borderWidth: 1,
+    borderRadius: 5,
+  },
   removeBtn: {
     position: "absolute",
-    top: 5,
-    right: 5,
-    opacity: 0.8,
+    bottom: 15,
+    right: 20,
+    zIndex: 2,
+    backgroundColor: Colors.mainColor,
+    borderRadius: 50,
+    width: 50,
+    height: 50,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  privacy: {
+    position: "absolute",
+    flexDirection: "column",
+    alignItems: "center",
+    top: 10,
+    right: 15,
+    zIndex: 2,
+  },
+  privacyText: {
+    color: "white",
   },
 });

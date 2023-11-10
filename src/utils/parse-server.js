@@ -26,7 +26,7 @@ async function getUserId() {
   return userId;
 }
 
-async function getServerTime() {
+export async function _getServerTime() {
   const response = await Parse.Cloud.run("getServerTime");
   return response.time;
 }
@@ -91,7 +91,7 @@ export async function _publishVideo(video, thumbnail, data, callback) {
   const thumbnailFile = await uploadThumbnail(uid, thumbnail);
   const videoFile = await uploadVideo(uid, video, callback);
 
-  const timestamp = await getServerTime();
+  const timestamp = await _getServerTime();
 
   const Video = Parse.Object.extend("Video");
   const videoObj = new Video();
@@ -128,7 +128,7 @@ async function uploadVideo(uid, video, callback) {
 
 export async function _getMyVideos() {
   const uid = await getUserId();
-  const serverTime = await getServerTime();
+  const serverTime = await _getServerTime();
 
   const video = Parse.Object.extend("Video");
   const query = new Parse.Query(video);

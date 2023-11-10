@@ -6,6 +6,7 @@ import {
   _publishVideo,
   _getMyVideos,
   _removeVideo,
+  _getServerTime,
 } from "./parse-server";
 
 export function init() {
@@ -34,4 +35,8 @@ export async function getMyVideos() {
 
 export async function removeVideo(id) {
   return await _removeVideo(id);
+}
+
+export async function getServerTime() {
+  return await _getServerTime();
 }
