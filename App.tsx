@@ -19,14 +19,14 @@ import { Provider } from "react-redux";
 
 import CustomButton from "./src/components/ui/button";
 import Auth from "./src/screens/auth";
-import Globe from "./src/screens/globe";
-import Local from "./src/screens/local";
 import Moment from "./src/screens/moment";
+import Moments from "./src/screens/moments";
 import Profile from "./src/screens/profile";
 import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
 import { Colors } from "./src/utils/colors";
 import { init as initDB } from "./src/utils/db";
+import "./src/utils/i18n";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -101,16 +101,16 @@ export default function App() {
   function Tabs() {
     return (
       <Tab.Navigator
-        initialRouteName="Globe"
+        initialRouteName="Profile"
         screenOptions={{
           tabBarActiveTintColor: Colors.mainTextColor,
         }}
       >
         <Tab.Screen
-          name="Globe"
-          component={Globe}
+          name="Moments"
+          component={Moments}
           options={{
-            title: "Globe",
+            title: "Moments",
             tabBarIcon: ({ color, size }) => (
               <Entypo name="globe" size={24} color={color} />
             ),
@@ -120,19 +120,9 @@ export default function App() {
           name="Record"
           component={Moment}
           options={{
-            title: "Moment",
+            title: "Record",
             tabBarIcon: ({ color, size }) => (
               <Entypo name="video-camera" size={24} color={color} />
-            ),
-          }}
-        />
-        <Tab.Screen
-          name="Local"
-          component={Local}
-          options={{
-            title: "Local",
-            tabBarIcon: ({ color, size }) => (
-              <Fontisto name="map-marker-alt" size={24} color={color} />
             ),
           }}
         />

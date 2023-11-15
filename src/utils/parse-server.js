@@ -93,6 +93,8 @@ export async function _publishVideo(video, thumbnail, data, callback) {
 
   const timestamp = await _getServerTime();
 
+  const location = new Parse.GeoPoint(data.location);
+
   const Video = Parse.Object.extend("Video");
   const videoObj = new Video();
   videoObj.set("owner", uid);
@@ -101,7 +103,7 @@ export async function _publishVideo(video, thumbnail, data, callback) {
   videoObj.set("thumbnail", thumbnailFile);
   videoObj.set("thumbnailUrl", thumbnailFile.url());
   videoObj.set("description", data.description);
-  videoObj.set("location", data.location);
+  videoObj.set("location", location);
   videoObj.set("lifetime", data.lifetime);
   videoObj.set("privacy", data.privacy);
   videoObj.set("likes", 0);
@@ -126,6 +128,49 @@ async function uploadVideo(uid, video, callback) {
   });
 }
 
+export async function _getNearVideos(location, radius, onlyFirends) {
+  const userGeoPoint = new Parse.GeoPoint(
+    location.latitude,
+    location.longitude,
+  );
+
+  const serverTime = await _getServerTime();
+  const sorted = true;
+
+  const video = Parse.Object.extend("Video");
+  const query = new Parse.Query(video);
+  // query.greaterThan("expireAt", serverTime);
+  query.withinKilometers("location", userGeoPoint, radius, sorted);
+  const results = await query.find();
+
+  const response = [];
+
+  results.forEach((video) => {
+    //TO DO get owner Photo
+
+    const geoPoint = video.get("location");
+    const location = {
+      latitude: geoPoint.latitude,
+      longitude: geoPoint.longitude,
+    };
+
+    const data = {
+      videoUrl: video.get("videoUrl"),
+      likes: video.get("likes"),
+      dislikes: video.get("dislikes"),
+      description: video.get("description"),
+      expireAt: video.get("expireAt"),
+      privacy: video.get("privacy"),
+      lifetime: video.get("lifetime"),
+      createdAt: video.get("createdAt"),
+      location,
+    };
+    response.push({ id: video.id, serverTime, ...data });
+  });
+
+  return response;
+}
+
 export async function _getMyVideos() {
   const uid = await getUserId();
   const serverTime = await _getServerTime();
@@ -133,7 +178,7 @@ export async function _getMyVideos() {
   const video = Parse.Object.extend("Video");
   const query = new Parse.Query(video);
   query.equalTo("owner", uid);
-  query.greaterThan("expireAt", serverTime);
+  // query.greaterThan("expireAt", serverTime);
   const results = await query.find();
 
   const response = [];

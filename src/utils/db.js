@@ -7,6 +7,7 @@ import {
   _getMyVideos,
   _removeVideo,
   _getServerTime,
+  _getNearVideos,
 } from "./parse-server";
 
 export function init() {
@@ -39,4 +40,8 @@ export async function removeVideo(id) {
 
 export async function getServerTime() {
   return await _getServerTime();
+}
+
+export async function getNearVideos(location, radius, onlyFirends) {
+  return await _getNearVideos(location, radius, onlyFirends);
 }
