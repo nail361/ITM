@@ -27,6 +27,7 @@ import { checkAuth } from "./src/store/auth";
 import { Colors } from "./src/utils/colors";
 import { init as initDB } from "./src/utils/db";
 import "./src/utils/i18n";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -103,7 +104,8 @@ export default function App() {
       <Tab.Navigator
         initialRouteName="Profile"
         screenOptions={{
-          tabBarActiveTintColor: Colors.mainTextColor,
+          tabBarActiveTintColor: Colors.secondColor,
+          headerShown: false,
         }}
       >
         <Tab.Screen
@@ -112,7 +114,7 @@ export default function App() {
           options={{
             title: "Moments",
             tabBarIcon: ({ color, size }) => (
-              <Entypo name="globe" size={24} color={color} />
+              <Entypo name="video" size={24} color={color} />
             ),
           }}
         />
@@ -146,6 +148,7 @@ export default function App() {
       ...DefaultTheme.colors,
       primary: Colors.mainColor,
       secondary: Colors.secondColor,
+      secondaryContainer: Colors.secondColor,
     },
     // fonts: {
     //   fontFamily: "ubintu",
@@ -155,21 +158,23 @@ export default function App() {
   return (
     <Provider store={store}>
       <PaperProvider theme={theme}>
-        <View onLayout={onLayoutRootView} style={styles.mainView}>
-          <NavigationContainer>
-            <Stack.Navigator
-              initialRouteName={isAuth ? "Main" : "Auth"}
-              screenOptions={{
-                headerBackVisible: false,
-                headerShown: false,
-              }}
-            >
-              <Stack.Screen name="Auth" component={Auth} />
-              <Stack.Screen name="Main" component={Tabs} />
-            </Stack.Navigator>
-          </NavigationContainer>
-          <StatusBar style="auto" />
-        </View>
+        <SafeAreaView style={styles.mainView}>
+          <View onLayout={onLayoutRootView} style={styles.mainView}>
+            <NavigationContainer>
+              <Stack.Navigator
+                initialRouteName={isAuth ? "Main" : "Auth"}
+                screenOptions={{
+                  headerBackVisible: false,
+                  headerShown: false,
+                }}
+              >
+                <Stack.Screen name="Auth" component={Auth} />
+                <Stack.Screen name="Main" component={Tabs} />
+              </Stack.Navigator>
+            </NavigationContainer>
+            <StatusBar style="auto" />
+          </View>
+        </SafeAreaView>
       </PaperProvider>
     </Provider>
   );

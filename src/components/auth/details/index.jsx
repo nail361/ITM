@@ -54,7 +54,7 @@ export default function AuthDetails(props) {
           email: response.email,
           uid: response.objectId,
           createdAt: new Date(response.createdAt).getTime() / 1000,
-          displayName: response.username,
+          username: response.username,
           photo: "",
         }),
       );
@@ -78,7 +78,7 @@ export default function AuthDetails(props) {
           email: response.email,
           uid: response.objectId,
           createdAt: Math.ceil(new Date(response.createdAt).getTime() / 1000),
-          displayName: response.username,
+          username: response.username,
           photo: "",
         }),
       );

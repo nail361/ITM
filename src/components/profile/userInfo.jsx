@@ -58,6 +58,7 @@ export default function UserInfo(props) {
 
   return (
     <View style={styles.container}>
+      <CustomText>{user.name}</CustomText>
       <Avatar.Icon size={80} icon={"account"} />
       <CustomText style={styles.emailText}>{user.email}</CustomText>
       <View style={styles.statistic}>

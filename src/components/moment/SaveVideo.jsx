@@ -120,10 +120,12 @@ export default function SaveVideo(props) {
               {
                 value: "public",
                 label: "PUBLIC",
+                icon: "lock-open-variant-outline",
               },
               {
                 value: "private",
                 label: "PRIVATE",
+                icon: "lock-outline",
               },
             ]}
           />

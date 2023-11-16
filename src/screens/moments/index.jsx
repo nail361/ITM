@@ -1,15 +1,20 @@
 import Slider from "@react-native-community/slider";
+import { Entypo } from "@expo/vector-icons";
+import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Pressable } from "react-native";
+import { View, Pressable, FlatList } from "react-native";
 import MapView, { Marker, Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 
 import styles from "./styles";
 import Loading from "../../components/ui/loading";
-import { getNearVideos } from "../../utils/db";
 import { Colors } from "../../utils/colors";
+import { getNearVideos } from "../../utils/db";
+import CustomText from "../../components/ui/text";
+import VideoList from "../../components/moments/video";
+import VideoPreview from "../../components/moments/vidiewPreview";
 
 function CustomMarker(props) {
   return <View style={styles.marker}></View>;
@@ -22,6 +27,7 @@ function Moments() {
   const [type, setType] = useState("local");
   const [radius, setRadius] = useState(500); //in meters
   const [videos, setVideos] = useState([]);
+  const [video, setVideo] = useState(null);
   const [myLocation, setMyLocation] = useState({
     latitude: 0,
     longitude: 0,
@@ -63,7 +69,20 @@ function Moments() {
   }
 
   function onVideoPress(videoId) {
-    console.log(videoId);
+    const videoObj = videos.find((vid) => vid.id === videoId);
+    setVideo(videoObj);
+  }
+
+  function onClosePreview() {
+    setVideo(null);
+  }
+
+  function onLike(id) {
+    console.log(id);
+  }
+
+  function onDislike(id) {
+    console.log(id);
   }
 
   if (loading) {
@@ -76,17 +95,32 @@ function Moments() {
 
   return (
     <View style={styles.container}>
+      {video && (
+        <VideoPreview
+          {...video}
+          onClosePreview={onClosePreview}
+          onLike={onLike}
+          onDislike={onDislike}
+        />
+      )}
       <SegmentedButtons
         value={type}
         onValueChange={setType}
+        style={styles.locationSwitch}
         buttons={[
           {
             value: "world",
             label: "WORLD",
+            icon: "earth",
+            checkedColor: "white",
+            uncheckedColor: "grey",
           },
           {
             value: "local",
             label: "LOCAL",
+            icon: "crosshairs-gps",
+            checkedColor: "white",
+            uncheckedColor: "grey",
           },
         ]}
       />
@@ -97,8 +131,8 @@ function Moments() {
         maxZoomLevel={20}
         showsPointsOfInterest={false}
         // showsBuildings={false}
-        // pitchEnabled={false}
-        // zoomTapEnabled={false}
+        pitchEnabled={false}
+        zoomTapEnabled={false}
         // zoomControlEnabled={false}
         rotateEnabled={false}
         // scrollEnabled={false}
@@ -149,6 +183,16 @@ function Moments() {
         thumbTintColor={Colors.mainColor}
         onSlidingComplete={onChangeRadiusComplete}
         onValueChange={(value) => setRadius(value)}
+      />
+      <FlatList
+        contentContainerStyle={styles.videos}
+        numColumns={2}
+        removeClippedSubviews
+        data={videos}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <VideoList {...item} onPress={onVideoPress} />
+        )}
       />
     </View>
   );

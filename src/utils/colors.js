@@ -1,9 +1,10 @@
 export const Colors = {
-  mainColor: "#686461",
-  secondColor: "#9E9B98",
-  headerTextColor: "#CEAD6D",
-  mainTextColor: "#BACBDB",
-  lightTextColor: "#E1DCE0",
+  mainColor: "#309975",
+  secondColor: "#58b368",
+  headerTextColor: "#454d66",
+  mainTextColor: "#dad873",
+  lightTextColor: "#efeeb4",
+  bgColor: "#454d66",
 
   popularity: {
     p15: "green",

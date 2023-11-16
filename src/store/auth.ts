@@ -7,7 +7,7 @@ interface storeProps {
   uid: string;
   email: string;
   createdAt: string;
-  displayName: string;
+  username: string;
   photo: string;
 }
 
@@ -17,7 +17,7 @@ const initialState: storeProps = {
   uid: "",
   email: "",
   createdAt: "",
-  displayName: "",
+  username: "",
   photo: "",
 };
 
@@ -41,7 +41,7 @@ const slice = createSlice({
       state.email = action.payload.email;
       state.uid = action.payload.uid;
       state.createdAt = action.payload.createdAt;
-      state.displayName = action.payload.displayName;
+      state.username = action.payload.username;
       state.photo = action.payload.photo;
       AsyncStorage.setItem(
         storageItemKey,
@@ -49,7 +49,7 @@ const slice = createSlice({
           token: action.payload.token,
           uid: action.payload.uid,
           email: action.payload.email,
-          displayName: action.payload.displayName,
+          username: action.payload.username,
           photo: action.payload.photo,
         }),
       );
@@ -60,7 +60,7 @@ const slice = createSlice({
       state.email = "";
       state.uid = "";
       state.createdAt = "";
-      state.displayName = "";
+      state.username = "";
       state.photo = "";
       AsyncStorage.removeItem(storageItemKey);
     },
@@ -72,7 +72,7 @@ const slice = createSlice({
       state.email = action.payload.email;
       state.uid = action.payload.uid;
       state.createdAt = action.payload.createdAt;
-      state.displayName = action.payload.displayName;
+      state.username = action.payload.username;
       state.photo = action.payload.photo;
     });
   },

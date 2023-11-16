@@ -22,7 +22,7 @@ function Title(props: TitleProps) {
 }
 
 function Profile() {
-  const name = useSelector((state: RootState) => state.auth.displayName);
+  const name = useSelector((state: RootState) => state.auth.username);
   const email = useSelector((state: RootState) => state.auth.email);
   const photo = useSelector((state: RootState) => state.auth.photo);
 
@@ -30,6 +30,7 @@ function Profile() {
   const navigation = useNavigation();
 
   useEffect(() => {
+    /*
     navigation.setOptions({
       headerTitle: (props: any) => <Title title={name} />,
       headerRight: () => (
@@ -37,7 +38,7 @@ function Profile() {
           <Entypo name="menu" size={32} color={Colors.mainColor} />
         </Pressable>
       ),
-    });
+    });*/
   }, []);
 
   const user = {

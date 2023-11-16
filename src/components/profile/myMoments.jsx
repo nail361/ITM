@@ -168,7 +168,7 @@ export default function MyMoments() {
             showPreview={showPreview}
           />
         )}
-      ></FlatList>
+      />
     </View>
   );
 }
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
     top: 0,
     width: "100%",
     height: "100%",
-    backgroundColor: Colors.secondColor,
+    backgroundColor: Colors.bgColor,
     zIndex: 1,
     padding: 10,
     justifyContent: "center",
