@@ -4,8 +4,8 @@ import { useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View, Pressable } from "react-native";
 
-import Loading from "../../components/ui/loading";
-import CustomText from "../../components/ui/text";
+import Loading from "../ui/loading";
+import CustomText from "../ui/text";
 import { Colors } from "../../utils/colors";
 
 function VideoPreview(props) {
@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
   videoPreviewWrapper: {
     height: "100%",
     width: "100%",
-    zIndex: 1,
+    zIndex: 2,
     backgroundColor: Colors.bgColor,
     flexDirection: "column",
     justifyContent: "flex-start",

@@ -1,5 +1,5 @@
-import Slider from "@react-native-community/slider";
 import { Entypo } from "@expo/vector-icons";
+import Slider from "@react-native-community/slider";
 import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
@@ -9,14 +9,14 @@ import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 
 import styles from "./styles";
+import CustomMarker from "../../components/moments/marker";
+import VideoList from "../../components/moments/videoList";
+import VideoPreview from "../../components/moments/videoPreview";
 import Loading from "../../components/ui/loading";
+import CustomSwitcher from "../../components/ui/switcher";
+import CustomText from "../../components/ui/text";
 import { Colors } from "../../utils/colors";
 import { getNearVideos } from "../../utils/db";
-import CustomText from "../../components/ui/text";
-import VideoList from "../../components/moments/videoList";
-import VideoPreview from "../../components/moments/vidiewPreview";
-import CustomMarker from "../../components/moments/marker";
-import CustomSwitcher from "../../components/ui/switcher";
 
 const MIN_RADIUS = 500;
 const MAX_RADIUS = 6000;
@@ -31,8 +31,7 @@ function Moments() {
     latitude: 0,
     longitude: 0,
   });
-  const [distance, setDistance] = useState(5);
-  const [onlyFirends, setOnlyFriends] = useState(false);
+  const [onlyFollowing, setOnlyFollowing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sorting, setSorting] = useState("time");
   const [sortDirection, setSotrDirection] = useState(1);
@@ -70,11 +69,7 @@ function Moments() {
 
     setMyLocation(locationObj);
 
-    const response = await getNearVideos(
-      locationObj,
-      radius / 1000,
-      onlyFirends,
-    );
+    const response = await getNearVideos(locationObj, radius / 1000);
     setVideos(response);
     setLoading(false);
   }
@@ -153,9 +148,9 @@ function Moments() {
       <View style={styles.switcherRow}>
         <CustomText style={styles.switcherText}>подписки</CustomText>
         <CustomSwitcher
-          value={onlyFirends}
+          value={onlyFollowing}
           onToggle={() => {
-            setOnlyFriends((prevState) => !prevState);
+            setOnlyFollowing((prevState) => !prevState);
           }}
         />
       </View>

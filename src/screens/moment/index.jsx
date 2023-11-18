@@ -97,7 +97,6 @@ function Moment() {
           console.warn(error);
         }
       } else {
-        console.log("stopRecording");
         stopRecording();
       }
     }

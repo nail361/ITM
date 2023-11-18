@@ -40,19 +40,11 @@ export async function _getCurrentUser() {
 }
 
 export async function _createUser(name, email, password) {
-  const user = new Parse.User();
-  user.set("username", name);
-  user.set("password", password);
-  user.set("email", email);
-
-  return await user
-    .signUp()
-    .then((createdUser) => {
-      return createdUser;
-    })
-    .catch((error) => {
-      return { error: error.message };
-    });
+  return await Parse.Cloud.run("createUser", {
+    name,
+    email,
+    password,
+  });
 }
 
 export async function _loginUser(name, password) {
@@ -128,94 +120,20 @@ async function uploadVideo(uid, video, callback) {
   });
 }
 
-export async function _getNearVideos(location, radius, onlyFirends) {
-  const userGeoPoint = new Parse.GeoPoint(
-    location.latitude,
-    location.longitude,
-  );
-
-  const serverTime = await _getServerTime();
-  const sorted = true;
-
-  const video = Parse.Object.extend("Video");
-  const query = new Parse.Query(video);
-  // query.greaterThan("expireAt", serverTime);
-  query.withinKilometers("location", userGeoPoint, radius, sorted);
-  const results = await query.find();
-
-  const response = [];
-
-  results.forEach((video) => {
-    //TO DO get owner Photo
-    const owner = video.get("owner");
-
-    /*
-    const user = Parse.Object.extend("_User");
-    const query = new Parse.Query(user);
-    query.equalTo("uid", owner);
-    query.limit(1);
-    const result = await query.fint();
-    */
-
-    const avatar =
-      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEQcB8xPXGmRlQ6wid7lJ7eHgfKe9rEHYiQ&usqp=CAU";
-
-    const geoPoint = video.get("location");
-    const location = {
-      latitude: geoPoint.latitude,
-      longitude: geoPoint.longitude,
-    };
-
-    const data = {
-      videoUrl: video.get("videoUrl"),
-      likes: video.get("likes"),
-      dislikes: video.get("dislikes"),
-      description: video.get("description"),
-      expireAt: video.get("expireAt"),
-      privacy: video.get("privacy"),
-      lifetime: video.get("lifetime"),
-      owner,
-      avatar,
-      createdAt: video.get("createdAt"),
-      location,
-    };
-    response.push({ id: video.id, serverTime, ...data });
+export async function _getNearVideos(location, radius) {
+  return await Parse.Cloud.run("getNearVideos", {
+    location,
+    radius,
   });
-
-  return response;
 }
 
 export async function _getMyVideos() {
   const uid = await getUserId();
-  const serverTime = await _getServerTime();
-
-  const video = Parse.Object.extend("Video");
-  const query = new Parse.Query(video);
-  query.equalTo("owner", uid);
-  // query.greaterThan("expireAt", serverTime);
-  const results = await query.find();
-
-  const response = [];
-  results.forEach((video) => {
-    const data = {
-      videoUrl: video.get("videoUrl"),
-      thumbnailUrl: video.get("thumbnailUrl"),
-      likes: video.get("likes"),
-      dislikes: video.get("dislikes"),
-      description: video.get("description"),
-      expireAt: video.get("expireAt"),
-      privacy: video.get("privacy"),
-      lifetime: video.get("lifetime"),
-      createdAt: video.get("createdAt"),
-    };
-    response.push({ id: video.id, serverTime, ...data });
+  return await Parse.Cloud.run("getUserVideos", {
+    uid,
   });
-
-  return response;
 }
 
 export async function _removeVideo(id) {
-  return await Parse.Cloud.run("deleteVideo", {
-    id,
-  });
+  return await Parse.Cloud.run("deleteVideo", { id });
 }
