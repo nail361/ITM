@@ -56,10 +56,16 @@ function Popularity(props) {
 export default function UserInfo(props) {
   const { user } = props;
 
+  const avatar = user.photo || "";
+
   return (
     <View style={styles.container}>
       <CustomText>{user.name}</CustomText>
-      <Avatar.Icon size={80} icon={"account"} />
+      {avatar ? (
+        <Avatar.Image size={80} source={{ uri: avatar }} />
+      ) : (
+        <Avatar.Icon size={80} icon={"account"} />
+      )}
       <CustomText style={styles.emailText}>{user.email}</CustomText>
       <View style={styles.statistic}>
         <View style={styles.counterContainer}>

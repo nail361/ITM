@@ -5,7 +5,7 @@ import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { View, Pressable, FlatList } from "react-native";
-import MapView, { Marker, Circle } from "react-native-maps";
+import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 
 import styles from "./styles";
@@ -13,12 +13,10 @@ import Loading from "../../components/ui/loading";
 import { Colors } from "../../utils/colors";
 import { getNearVideos } from "../../utils/db";
 import CustomText from "../../components/ui/text";
-import VideoList from "../../components/moments/video";
+import VideoList from "../../components/moments/videoList";
 import VideoPreview from "../../components/moments/vidiewPreview";
-
-function CustomMarker(props) {
-  return <View style={styles.marker}></View>;
-}
+import CustomMarker from "../../components/moments/marker";
+import CustomSwitcher from "../../components/ui/switcher";
 
 const MIN_RADIUS = 500;
 const MAX_RADIUS = 6000;
@@ -28,6 +26,7 @@ function Moments() {
   const [radius, setRadius] = useState(500); //in meters
   const [videos, setVideos] = useState([]);
   const [video, setVideo] = useState(null);
+  const [selectedVideo, setSelectedVideo] = useState("");
   const [myLocation, setMyLocation] = useState({
     latitude: 0,
     longitude: 0,
@@ -35,9 +34,25 @@ function Moments() {
   const [distance, setDistance] = useState(5);
   const [onlyFirends, setOnlyFriends] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [sorting, setSorting] = useState("time");
+  const [sortDirection, setSotrDirection] = useState(1);
   const [t] = useTranslation();
 
   const delta = radius / MIN_RADIUS / 100;
+
+  const orderedVideos = videos.sort((a, b) => {
+    let sort = 0;
+    if (sorting === "likes") {
+      sort = a.likes - a.dislikes > b.likes - b.dislikes ? 1 : -1;
+    } else if (sorting === "time") {
+      sort =
+        new Date(a.createdAt).getTime() > new Date(b.createdAt).getTime()
+          ? 1
+          : -1;
+    }
+
+    return sort * sortDirection;
+  });
 
   useEffect(() => {
     fetchVideos();
@@ -68,12 +83,18 @@ function Moments() {
     // fetchVideos();
   }
 
-  function onVideoPress(videoId) {
+  function onSelectVideo(videoId) {
+    if (selectedVideo === videoId) showPreview(videoId);
+    else setSelectedVideo(videoId);
+  }
+
+  function showPreview(videoId) {
     const videoObj = videos.find((vid) => vid.id === videoId);
     setVideo(videoObj);
   }
 
   function onClosePreview() {
+    setSelectedVideo("");
     setVideo(null);
   }
 
@@ -83,6 +104,11 @@ function Moments() {
 
   function onDislike(id) {
     console.log(id);
+  }
+
+  function onSort(sort) {
+    setSorting(sort);
+    setSotrDirection((prevState) => prevState * -1);
   }
 
   if (loading) {
@@ -124,6 +150,15 @@ function Moments() {
           },
         ]}
       />
+      <View style={styles.switcherRow}>
+        <CustomText style={styles.switcherText}>подписки</CustomText>
+        <CustomSwitcher
+          value={onlyFirends}
+          onToggle={() => {
+            setOnlyFriends((prevState) => !prevState);
+          }}
+        />
+      </View>
       <MapView
         style={styles.map}
         showsUserLocation={false}
@@ -160,16 +195,12 @@ function Moments() {
           fillColor="#0000ff20"
         />
         {videos.map((video) => (
-          <Marker
+          <CustomMarker
             key={video.id}
-            coordinate={{
-              latitude: myLocation.latitude,
-              longitude: myLocation.longitude,
-            }}
-            onPress={() => onVideoPress(video.id)}
-          >
-            <CustomMarker {...video} />
-          </Marker>
+            selected={video.id === selectedVideo}
+            {...video}
+            onPress={showPreview}
+          />
         ))}
       </MapView>
       <Slider
@@ -184,14 +215,41 @@ function Moments() {
         onSlidingComplete={onChangeRadiusComplete}
         onValueChange={(value) => setRadius(value)}
       />
+      <View style={styles.sorting}>
+        <Pressable style={styles.sortingRow} onPress={() => onSort("time")}>
+          <CustomText style={styles.sortingText}>время</CustomText>
+          {sorting === "time" && (
+            <Entypo
+              style={styles.sortingDirection}
+              name={sortDirection === 1 ? "arrow-long-down" : "arrow-long-up"}
+              size={12}
+              color="white"
+            />
+          )}
+        </Pressable>
+        <Pressable style={styles.sortingRow} onPress={() => onSort("likes")}>
+          <CustomText style={styles.sortingText}>популярность</CustomText>
+          {sorting === "likes" && (
+            <Entypo
+              style={styles.sortingDirection}
+              name={sortDirection === 1 ? "arrow-long-down" : "arrow-long-up"}
+              size={12}
+              color="white"
+            />
+          )}
+        </Pressable>
+      </View>
       <FlatList
-        contentContainerStyle={styles.videos}
-        numColumns={2}
-        removeClippedSubviews
-        data={videos}
+        style={styles.videoList}
+        numColumns={1}
+        data={orderedVideos}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <VideoList {...item} onPress={onVideoPress} />
+          <VideoList
+            {...item}
+            selected={item.id === selectedVideo}
+            onPress={onSelectVideo}
+          />
         )}
       />
     </View>

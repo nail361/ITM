@@ -147,6 +147,18 @@ export async function _getNearVideos(location, radius, onlyFirends) {
 
   results.forEach((video) => {
     //TO DO get owner Photo
+    const owner = video.get("owner");
+
+    /*
+    const user = Parse.Object.extend("_User");
+    const query = new Parse.Query(user);
+    query.equalTo("uid", owner);
+    query.limit(1);
+    const result = await query.fint();
+    */
+
+    const avatar =
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQyEQcB8xPXGmRlQ6wid7lJ7eHgfKe9rEHYiQ&usqp=CAU";
 
     const geoPoint = video.get("location");
     const location = {
@@ -162,6 +174,8 @@ export async function _getNearVideos(location, radius, onlyFirends) {
       expireAt: video.get("expireAt"),
       privacy: video.get("privacy"),
       lifetime: video.get("lifetime"),
+      owner,
+      avatar,
       createdAt: video.get("createdAt"),
       location,
     };

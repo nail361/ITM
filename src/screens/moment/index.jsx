@@ -88,12 +88,16 @@ function Moment() {
             setIsRecording(true);
             const data = await videoRecordPromise;
             const source = data.uri;
-            setVideo(source);
+            if (source) {
+              setVideo(source);
+            }
           }
         } catch (error) {
+          console.log("ERROR");
           console.warn(error);
         }
       } else {
+        console.log("stopRecording");
         stopRecording();
       }
     }

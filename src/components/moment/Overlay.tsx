@@ -1,6 +1,9 @@
-import { Image } from "expo-image";
-import { View, StyleSheet, Pressable } from "react-native";
 import { Entypo } from "@expo/vector-icons";
+import { Image } from "expo-image";
+import { useEffect, useState } from "react";
+import { View, StyleSheet, Pressable } from "react-native";
+
+import CustomText from "../ui/text";
 
 type CameraOverlayType = {
   isRecording: boolean;
@@ -10,6 +13,9 @@ type CameraOverlayType = {
   onToggleCameraDirection: any;
   onToggleFlashlight: any;
 };
+
+let timer: any = null;
+const MIN_RECORD_SEC = 5;
 
 function CameraOverlay(props: CameraOverlayType) {
   const {
@@ -21,14 +27,44 @@ function CameraOverlay(props: CameraOverlayType) {
     onToggleFlashlight,
   } = props;
 
+  const [counter, setCounter] = useState(MIN_RECORD_SEC);
+
+  useEffect(() => {
+    if (isRecording) {
+      setCounter(MIN_RECORD_SEC);
+      timer = setInterval(onTick, 1000);
+    }
+
+    return () => {
+      if (timer) clearInterval(timer);
+    };
+  }, [isRecording]);
+
+  function onTick() {
+    setCounter((prevCounter) => {
+      const newCounter = prevCounter - 1;
+      if (newCounter === 0) clearInterval(timer);
+      return newCounter;
+    });
+  }
+
   return (
     <>
       <View style={styles.container}>
         <View style={styles.buttons}>
           <Pressable
-            style={[styles.button, isRecording ? styles.recording : null]}
+            style={[
+              styles.recordButton,
+              isRecording ? styles.recording : null,
+              isRecording && counter > 0 ? styles.disabled : null,
+            ]}
+            disabled={isRecording && counter > 0}
             onPress={onToggleRecord}
-          ></Pressable>
+          >
+            {isRecording && counter > 0 && (
+              <CustomText style={styles.counter}>{counter}</CustomText>
+            )}
+          </Pressable>
           {gallery.length > 0 && (
             <Pressable
               style={[styles.gallery, isRecording ? styles.hidden : null]}
@@ -43,7 +79,7 @@ function CameraOverlay(props: CameraOverlayType) {
         </View>
       </View>
       <View style={styles.sidebar}>
-        <Pressable onPress={onToggleCameraDirection}>
+        <Pressable onPress={onToggleCameraDirection} disabled={isRecording}>
           <Entypo name="cycle" size={36} color="white" />
         </Pressable>
         <Pressable onPress={onToggleFlashlight}>
@@ -67,16 +103,27 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     paddingBottom: 30,
   },
-  button: {
+  recordButton: {
     width: 80,
     height: 80,
     borderRadius: 50,
     backgroundColor: "#ff4040",
     borderWidth: 8,
     borderColor: "#ff404080",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  counter: {
+    fontSize: 30,
+    color: "white",
+    paddingTop: 10,
   },
   recording: {
     opacity: 0.5,
+  },
+  disabled: {
+    backgroundColor: "#ff402030",
+    borderColor: "#ff404030",
   },
   gallery: {
     borderWidth: 2,

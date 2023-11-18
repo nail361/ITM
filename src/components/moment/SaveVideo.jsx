@@ -121,11 +121,15 @@ export default function SaveVideo(props) {
                 value: "public",
                 label: "PUBLIC",
                 icon: "lock-open-variant-outline",
+                checkedColor: "white",
+                uncheckedColor: "grey",
               },
               {
                 value: "private",
                 label: "PRIVATE",
                 icon: "lock-outline",
+                checkedColor: "white",
+                uncheckedColor: "grey",
               },
             ]}
           />
@@ -170,6 +174,7 @@ const styles = StyleSheet.create({
     left: 0,
     width: "100%",
     height: "100%",
+    backgroundColor: Colors.bgColor,
   },
   videoContainer: {
     position: "relative",
@@ -187,7 +192,6 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     padding: 10,
     width: "100%",
-    backgroundColor: Colors.secondColor,
   },
   privacyWrapper: {
     flexDirection: "row",
@@ -221,7 +225,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-around",
-    backgroundColor: Colors.mainColor,
   },
   w150: {
     width: 150,
