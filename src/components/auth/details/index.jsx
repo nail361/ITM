@@ -9,6 +9,7 @@ import { createUser, loginUser } from "../../../utils/db";
 import CustomButton from "../../ui/button";
 import Loading from "../../ui/loading";
 import CustomTextInput from "../../ui/textInput";
+import { Colors } from "../../../utils/colors";
 
 export default function AuthDetails(props) {
   const { route } = props;
@@ -55,7 +56,6 @@ export default function AuthDetails(props) {
           uid: response.objectId,
           createdAt: new Date(response.createdAt).getTime() / 1000,
           username: response.username,
-          photo: "",
         }),
       );
       navigation.replace("Main");
@@ -67,21 +67,11 @@ export default function AuthDetails(props) {
   async function onLoginUser() {
     setLoading(true);
     const response = await loginUser(name, password);
-    console.log(response);
 
     if (response.error) {
       Alert.alert(response.error);
     } else {
-      dispatch(
-        authActions.login({
-          token: response.sessionToken,
-          email: response.email,
-          uid: response.objectId,
-          createdAt: Math.ceil(new Date(response.createdAt).getTime() / 1000),
-          username: response.username,
-          photo: "",
-        }),
-      );
+      dispatch(authActions.login({ ...response }));
       navigation.replace("Main");
     }
 

@@ -53,7 +53,17 @@ export async function _loginUser(name, password) {
       // To verify that this is in fact the current user, currentAsync can be used
       // const currentUser = await Parse.User.currentAsync();
       // console.log(loggedInUser === currentUser);
-      return loggedInUser;
+      const response = {
+        token: loggedInUser.get("sessionToken"),
+        email: loggedInUser.get("email"),
+        uid: loggedInUser.get("objectId"),
+        createdAt: Math.ceil(
+          new Date(loggedInUser.get("createdAt")).getTime() / 1000,
+        ),
+        username: loggedInUser.get("username"),
+      };
+
+      return response;
     })
     .catch((error) => {
       // Error can be caused by wrong parameters or lack of Internet connection
@@ -136,4 +146,26 @@ export async function _getMyVideos() {
 
 export async function _removeVideo(id) {
   return await Parse.Cloud.run("deleteVideo", { id });
+}
+
+export async function _getMyInfo() {
+  const uid = await getUserId();
+
+  return {
+    about: "Обо мне заглушка",
+    photo:
+      "https://i.pinimg.com/736x/5b/6e/ca/5b6eca63605bea0eeb48db43f77fa0ce.jpg",
+    likes: 456,
+    dislikes: 38,
+    followers: ["1", "2", "3"],
+    following: ["1"],
+  };
+
+  return await Parse.Cloud.run("getUserInfo", {
+    uid,
+  });
+}
+
+export async function _saveMyInfo() {
+  return true;
 }

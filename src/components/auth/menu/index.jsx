@@ -1,10 +1,11 @@
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
-import { Pressable, Text, View } from "react-native";
+import { Pressable, View } from "react-native";
 
 import styles from "./styles";
 import { Colors } from "../../../utils/colors";
+import CustomText from "../../ui/text";
 
 export default function AuthMenu(props) {
   const { navigation } = props;
@@ -24,8 +25,8 @@ export default function AuthMenu(props) {
           onPress={() => navigation.navigate("AuthDetail", { authPage })}
         >
           <View style={styles.providerButton}>
-            <Entypo name="email" size={24} color="black" />
-            <Text>UseEmail</Text>
+            <Entypo name="email" size={24} color="white" />
+            <CustomText style={styles.emailText}>UseEmail</CustomText>
           </View>
         </Pressable>
       </View>
@@ -40,15 +41,21 @@ export default function AuthMenu(props) {
           style={styles.signUpBackground}
         >
           {authPage === 0 ? (
-            <Text style={styles.signUpText}>
+            <CustomText style={styles.signUpText}>
               Don't have an account?
-              <Text style={[styles.signUpText, styles.boldText]}> Sign up</Text>
-            </Text>
+              <CustomText style={[styles.signUpText, styles.boldText]}>
+                {" "}
+                Sign up
+              </CustomText>
+            </CustomText>
           ) : (
-            <Text style={styles.signUpText}>
+            <CustomText style={styles.signUpText}>
               Already have an account?
-              <Text style={[styles.signUpText, styles.boldText]}> Sign in</Text>
-            </Text>
+              <CustomText style={[styles.signUpText, styles.boldText]}>
+                {" "}
+                Sign in
+              </CustomText>
+            </CustomText>
           )}
         </LinearGradient>
       </Pressable>

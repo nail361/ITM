@@ -9,9 +9,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   textIn: {
-    borderColor: "lightgrey",
-    borderBottomWidth: 1,
-    borderStyle: "solid",
     paddingHorizontal: 20,
     marginBottom: 20,
   },

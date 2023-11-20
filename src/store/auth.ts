@@ -8,7 +8,6 @@ interface storeProps {
   email: string;
   createdAt: string;
   username: string;
-  photo: string;
 }
 
 const initialState: storeProps = {
@@ -18,7 +17,6 @@ const initialState: storeProps = {
   email: "",
   createdAt: "",
   username: "",
-  photo: "",
 };
 
 const storageItemKey = "auth";
@@ -42,7 +40,6 @@ const slice = createSlice({
       state.uid = action.payload.uid;
       state.createdAt = action.payload.createdAt;
       state.username = action.payload.username;
-      state.photo = action.payload.photo;
       AsyncStorage.setItem(
         storageItemKey,
         JSON.stringify({
@@ -61,7 +58,6 @@ const slice = createSlice({
       state.uid = "";
       state.createdAt = "";
       state.username = "";
-      state.photo = "";
       AsyncStorage.removeItem(storageItemKey);
     },
   },
@@ -73,7 +69,6 @@ const slice = createSlice({
       state.uid = action.payload.uid;
       state.createdAt = action.payload.createdAt;
       state.username = action.payload.username;
-      state.photo = action.payload.photo;
     });
   },
 });

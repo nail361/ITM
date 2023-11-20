@@ -179,7 +179,6 @@ const styles = StyleSheet.create({
   },
   videos: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   video: {
     flex: 1 / 3,

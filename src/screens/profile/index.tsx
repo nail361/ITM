@@ -1,72 +1,79 @@
-import { Entypo } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect } from "react";
-import { Pressable, Text, View, Alert } from "react-native";
-import { useDispatch, useSelector } from "react-redux";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { useEffect, useState } from "react";
+import { Alert, View } from "react-native";
+import { useDispatch } from "react-redux";
 
-import styles from "./styles";
-import MyMoments from "../../components/profile/myMoments";
-import UserInfo from "../../components/profile/userInfo";
-import CustomButton from "../../components/ui/button";
-import { RootState } from "../../store";
-import { authActions } from "../../store/auth";
-import { Colors } from "../../utils/colors";
-import { logoutUser } from "../../utils/db";
+import EditProfile from "../../components/profile/editProfile";
+import Followers from "../../components/profile/followers";
+import Following from "../../components/profile/following";
+import MainProfile from "../../components/profile/mainProfile";
+import Loading from "../../components/ui/loading";
+import { profileActions } from "../../store/profile";
+import { getMyInfo } from "../../utils/db";
 
-type TitleProps = {
-  title: string;
-};
-
-function Title(props: TitleProps) {
-  return <Text style={styles.headerTitle}>{props.title}</Text>;
-}
+const Stack = createNativeStackNavigator();
 
 function Profile() {
-  const name = useSelector((state: RootState) => state.auth.username);
-  const email = useSelector((state: RootState) => state.auth.email);
-  const photo = useSelector((state: RootState) => state.auth.photo);
+  const [loader, setLoader] = useState(false);
 
   const dispatch = useDispatch();
-  const navigation = useNavigation();
 
   useEffect(() => {
-    /*
-    navigation.setOptions({
-      headerTitle: (props: any) => <Title title={name} />,
-      headerRight: () => (
-        <Pressable>
-          <Entypo name="menu" size={32} color={Colors.mainColor} />
-        </Pressable>
-      ),
-    });*/
+    fetchProfileData();
   }, []);
 
-  const user = {
-    email,
-    name,
-    photo,
-  };
+  async function fetchProfileData() {
+    setLoader(true);
+    const response = await getMyInfo();
 
-  async function onLogout() {
-    const response = await logoutUser();
-
-    if (response === true) {
-      dispatch(authActions.logout());
-      //@ts-ignore
-      navigation.replace("Auth");
+    if (response.error) {
+      Alert.alert(response.error);
     } else {
-      Alert.alert(response?.error);
+      dispatch(profileActions.init(response));
     }
+
+    setLoader(false);
+  }
+
+  if (loader) {
+    return (
+      <View style={{ flex: 1 }}>
+        <Loading />
+      </View>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <UserInfo user={user} />
-      <MyMoments />
-      <CustomButton onPress={onLogout} mode={"contained"}>
-        Log Out
-      </CustomButton>
-    </View>
+    <Stack.Navigator initialRouteName="mainProfile">
+      <Stack.Screen
+        name="mainProfile"
+        component={MainProfile}
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="editProfile"
+        component={EditProfile}
+        options={{
+          title: "Редактирование профиля",
+        }}
+      />
+      <Stack.Screen
+        name="followers"
+        component={Followers}
+        options={{
+          title: "Подписчики",
+        }}
+      />
+      <Stack.Screen
+        name="following"
+        component={Following}
+        options={{
+          title: "Подписчики",
+        }}
+      />
+    </Stack.Navigator>
   );
 }
 

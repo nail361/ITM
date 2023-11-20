@@ -7,6 +7,7 @@ import { useTranslation } from "react-i18next";
 import { View, Pressable, FlatList } from "react-native";
 import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import styles from "./styles";
 import CustomMarker from "../../components/moments/marker";
@@ -22,6 +23,7 @@ const MIN_RADIUS = 500;
 const MAX_RADIUS = 6000;
 
 function Moments() {
+  const insets = useSafeAreaInsets();
   const [type, setType] = useState("local");
   const [radius, setRadius] = useState(500); //in meters
   const [videos, setVideos] = useState([]);
@@ -115,7 +117,7 @@ function Moments() {
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {video && (
         <VideoPreview
           {...video}
@@ -145,7 +147,7 @@ function Moments() {
           },
         ]}
       />
-      <View style={styles.switcherRow}>
+      <View style={[styles.switcherRow, { top: insets.top + 50 }]}>
         <CustomText style={styles.switcherText}>подписки</CustomText>
         <CustomSwitcher
           value={onlyFollowing}

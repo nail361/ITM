@@ -8,6 +8,8 @@ import {
   _removeVideo,
   _getServerTime,
   _getNearVideos,
+  _getMyInfo,
+  _saveMyInfo,
 } from "./parse-server";
 
 export function init() {
@@ -44,4 +46,12 @@ export async function getServerTime() {
 
 export async function getNearVideos(location, radius, onlyFirends) {
   return await _getNearVideos(location, radius, onlyFirends);
+}
+
+export async function getMyInfo() {
+  return await _getMyInfo();
+}
+
+export async function saveMyInfo(data) {
+  return await _saveMyInfo();
 }

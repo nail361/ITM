@@ -1,6 +1,8 @@
+import { useNavigation } from "@react-navigation/native";
 import React from "react";
-import { StyleSheet, View } from "react-native";
+import { StyleSheet, View, Pressable } from "react-native";
 import { Avatar } from "react-native-paper";
+import { useSelector } from "react-redux";
 
 import { Colors } from "../../utils/colors";
 import CustomButton from "../ui/button";
@@ -54,34 +56,57 @@ function Popularity(props) {
 }
 
 export default function UserInfo(props) {
-  const { user } = props;
+  const name = useSelector((state) => state.auth.username);
+  const email = useSelector((state) => state.auth.email);
 
-  const avatar = user.photo || "";
+  const about = useSelector((state) => state.profile.about);
+  const photo = useSelector((state) => state.profile.photo);
+  const followers = useSelector((state) => state.profile.followers);
+  const following = useSelector((state) => state.profile.following);
+
+  const navigation = useNavigation();
+
+  function onEditProfile() {
+    navigation.push("editProfile");
+  }
+
+  function onFollowingPress() {
+    navigation.push("following");
+  }
+
+  function onFollowersPress() {
+    navigation.push("followers");
+  }
 
   return (
     <View style={styles.container}>
-      <CustomText>{user.name}</CustomText>
-      {avatar ? (
-        <Avatar.Image size={80} source={{ uri: avatar }} />
+      <CustomText>{name}</CustomText>
+      {photo ? (
+        <Avatar.Image size={80} source={{ uri: photo }} />
       ) : (
         <Avatar.Icon size={80} icon={"account"} />
       )}
-      <CustomText style={styles.emailText}>{user.email}</CustomText>
+      <CustomText style={styles.emailText}>{email}</CustomText>
+      <CustomText style={styles.aboutText}>{about}</CustomText>
       <View style={styles.statistic}>
-        <View style={styles.counterContainer}>
-          <CustomText style={styles.counter}>0</CustomText>
+        <Pressable style={styles.counterContainer} onPress={onFollowingPress}>
+          <CustomText style={styles.counter}>{following.length}</CustomText>
           <CustomText style={styles.counterText}>Following</CustomText>
-        </View>
+        </Pressable>
         <View style={styles.counterContainer}>
           <CustomText>Popularity</CustomText>
           <Popularity />
         </View>
-        <View style={styles.counterContainer}>
-          <CustomText style={styles.counter}>0</CustomText>
+        <Pressable style={styles.counterContainer} onPress={onFollowersPress}>
+          <CustomText style={styles.counter}>{followers.length}</CustomText>
           <CustomText style={styles.counterText}>Followers</CustomText>
-        </View>
+        </Pressable>
       </View>
-      <CustomButton style={styles.editBtn} mode={"outlined"}>
+      <CustomButton
+        style={styles.editBtn}
+        mode={"outlined"}
+        onPress={onEditProfile}
+      >
         Edit Profile
       </CustomButton>
       <View style={styles.divider} />
@@ -91,8 +116,10 @@ export default function UserInfo(props) {
 
 const styles = StyleSheet.create({
   container: {
-    paddingTop: 20,
     alignItems: "center",
+  },
+  aboutText: {
+    marginVertical: 10,
   },
   emailText: {
     marginVertical: 10,

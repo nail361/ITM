@@ -60,7 +60,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     position: "absolute",
     left: 10,
-    top: 50,
     zIndex: 1,
   },
   switcherText: {

@@ -147,7 +147,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     justifyContent: "space-between",
     height: 110,
-    top: 40,
+    top: 60,
     right: 20,
     position: "absolute",
     opacity: 0.8,

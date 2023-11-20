@@ -17,7 +17,10 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    backgroundColor: Colors.mainTextColor,
+    backgroundColor: Colors.bgColor,
+  },
+  emailText: {
+    color: "white",
   },
   signUpButton: {
     height: 50,
@@ -36,7 +39,7 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontFamily: "ubuntu-bold",
-    color: "lightblue",
+    color: Colors.lightTextColor,
   },
 });
 

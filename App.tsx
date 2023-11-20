@@ -27,7 +27,6 @@ import { checkAuth } from "./src/store/auth";
 import { Colors } from "./src/utils/colors";
 import { init as initDB } from "./src/utils/db";
 import "./src/utils/i18n";
-import { SafeAreaView } from "react-native-safe-area-context";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -158,23 +157,21 @@ export default function App() {
   return (
     <Provider store={store}>
       <PaperProvider theme={theme}>
-        <SafeAreaView style={styles.mainView}>
-          <View onLayout={onLayoutRootView} style={styles.mainView}>
-            <NavigationContainer>
-              <Stack.Navigator
-                initialRouteName={isAuth ? "Main" : "Auth"}
-                screenOptions={{
-                  headerBackVisible: false,
-                  headerShown: false,
-                }}
-              >
-                <Stack.Screen name="Auth" component={Auth} />
-                <Stack.Screen name="Main" component={Tabs} />
-              </Stack.Navigator>
-            </NavigationContainer>
-            <StatusBar style="auto" />
-          </View>
-        </SafeAreaView>
+        <View onLayout={onLayoutRootView} style={styles.mainView}>
+          <NavigationContainer>
+            <Stack.Navigator
+              initialRouteName={isAuth ? "Main" : "Auth"}
+              screenOptions={{
+                headerBackVisible: false,
+                headerShown: false,
+              }}
+            >
+              <Stack.Screen name="Auth" component={Auth} />
+              <Stack.Screen name="Main" component={Tabs} />
+            </Stack.Navigator>
+          </NavigationContainer>
+          <StatusBar style="auto" />
+        </View>
       </PaperProvider>
     </Provider>
   );

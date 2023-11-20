@@ -10,10 +10,12 @@ import styles from "./styles";
 import CameraOverlay from "../../components/moment/Overlay";
 import SaveVideo from "../../components/moment/SaveVideo";
 import ProgressBar from "../../components/moment/ProgressBar";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const VIDEO_MAX_DURATION = 60; //sec
 
 function Moment() {
+  const insets = useSafeAreaInsets();
   const camera = useRef(null);
   const [isRecording, setIsRecording] = useState(false);
   const [video, setVideo] = useState();
@@ -141,7 +143,7 @@ function Moment() {
   if (!isFocused) return null;
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top }]}>
       {!video && (
         <>
           <Camera
