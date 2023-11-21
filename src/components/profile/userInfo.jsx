@@ -1,12 +1,12 @@
 import { useNavigation } from "@react-navigation/native";
 import React from "react";
 import { StyleSheet, View, Pressable } from "react-native";
-import { Avatar } from "react-native-paper";
 import { useSelector } from "react-redux";
 
 import { Colors } from "../../utils/colors";
 import CustomButton from "../ui/button";
 import CustomText from "../ui/text";
+import CustomAvatar from "../ui/avatar";
 
 function Popularity(props) {
   const percent = 50;
@@ -81,11 +81,7 @@ export default function UserInfo(props) {
   return (
     <View style={styles.container}>
       <CustomText>{name}</CustomText>
-      {photo ? (
-        <Avatar.Image size={80} source={{ uri: photo }} />
-      ) : (
-        <Avatar.Icon size={80} icon={"account"} />
-      )}
+      <CustomAvatar size={80} photo={photo} />
       <CustomText style={styles.emailText}>{email}</CustomText>
       <CustomText style={styles.aboutText}>{about}</CustomText>
       <View style={styles.statistic}>

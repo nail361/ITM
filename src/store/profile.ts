@@ -30,6 +30,12 @@ const slice = createSlice({
       state.followers = action.payload.followers;
       state.following = action.payload.following;
     },
+    updateFollowing(state, action) {
+      state.following = action.payload;
+    },
+    updateFollowers(state, action) {
+      state.followers = action.payload;
+    },
   },
 });
 

@@ -4,7 +4,7 @@ import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Pressable, FlatList } from "react-native";
+import { View, Pressable, FlatList, Alert } from "react-native";
 import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
@@ -61,8 +61,13 @@ function Moments() {
 
   async function fetchVideos() {
     setLoading(true);
-    let location = await Location.getLastKnownPositionAsync();
-    if (location == null) location = await Location.getCurrentPositionAsync();
+    let location = null;
+    try {
+      location = await Location.getLastKnownPositionAsync();
+      if (location == null) location = await Location.getCurrentPositionAsync();
+    } catch (error) {
+      Alert.alert("Приложение не может работать с выключеной геолокацией");
+    }
 
     const locationObj = {
       latitude: location.coords.latitude,

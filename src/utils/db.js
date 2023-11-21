@@ -10,6 +10,7 @@ import {
   _getNearVideos,
   _getMyInfo,
   _saveMyInfo,
+  _getUsersInfo,
 } from "./parse-server";
 
 export function init() {
@@ -54,4 +55,8 @@ export async function getMyInfo() {
 
 export async function saveMyInfo(data) {
   return await _saveMyInfo();
+}
+
+export async function getUsersInfo(uids, data) {
+  return await _getUsersInfo(uids, data);
 }

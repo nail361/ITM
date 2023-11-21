@@ -70,7 +70,7 @@ function Profile() {
         name="following"
         component={Following}
         options={{
-          title: "Подписчики",
+          title: "Подписки",
         }}
       />
     </Stack.Navigator>

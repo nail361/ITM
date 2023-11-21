@@ -1,10 +1,10 @@
 import { StyleSheet, View, Pressable } from "react-native";
 import { Colors } from "../../utils/colors";
 import CustomText from "../ui/text";
-import { Avatar } from "react-native-paper";
+import CustomAvatar from "../ui/avatar";
 
 function VideoList(props) {
-  const { id, avatar, description, createdAt, selected, onPress } = props;
+  const { id, photo, description, createdAt, selected, onPress } = props;
 
   const time = new Date(createdAt).toLocaleTimeString();
 
@@ -13,11 +13,12 @@ function VideoList(props) {
   return (
     <Pressable onPress={() => onPress(id)}>
       <View style={[styles.container, selected ? styles.selected : null]}>
-        {avatar ? (
-          <Avatar.Image size={25} source={{ uri: avatar }} />
+        {photo ? (
+          <Avatar.Image size={25} source={{ uri: photo }} />
         ) : (
           <Avatar.Icon size={25} icon={"account"} />
         )}
+        <CustomAvatar size={25} photo={photo} />
         <CustomText style={styles.description}>
           {preparedDescription}
         </CustomText>

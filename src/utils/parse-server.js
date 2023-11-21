@@ -157,13 +157,33 @@ export async function _getMyInfo() {
       "https://i.pinimg.com/736x/5b/6e/ca/5b6eca63605bea0eeb48db43f77fa0ce.jpg",
     likes: 456,
     dislikes: 38,
-    followers: ["1", "2", "3"],
-    following: ["1"],
+    followers: ["1", "3"],
+    following: ["1", "2", "3"],
   };
 
   return await Parse.Cloud.run("getUserInfo", {
     uid,
   });
+}
+
+export async function _getUsersInfo(uids, data) {
+  return [
+    {
+      uid: "1",
+      photo: "",
+      name: "Denis",
+    },
+    {
+      uid: "2",
+      photo: "",
+      name: "Maxim",
+    },
+    {
+      uid: "3",
+      photo: "",
+      name: "Sergey",
+    },
+  ];
 }
 
 export async function _saveMyInfo() {

@@ -87,7 +87,7 @@ export default function MyMoments() {
   }
 
   function onVideoRemoveConfirm(videoId) {
-    Alert.alert("Remove video", "Are you shure to remove video?", [
+    Alert.alert("Remove video", "Are you sure to remove video?", [
       {
         text: "Cancel",
       },
