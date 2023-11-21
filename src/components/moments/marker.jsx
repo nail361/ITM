@@ -1,9 +1,9 @@
 import { StyleSheet, View } from "react-native";
 import { Marker } from "react-native-maps";
-import { Avatar } from "react-native-paper";
+import CustomAvatar from "../ui/avatar";
 
 function CustomMarker(props) {
-  const { id, avatar, location, selected, onPress } = props;
+  const { id, photo, location, selected, onPress } = props;
 
   const size = 50;
   const borderColor = "red";
@@ -33,11 +33,7 @@ function CustomMarker(props) {
           selected ? styles.selected : null,
         ]}
       >
-        {avatar ? (
-          <Avatar.Image size={size - borderWidth} source={{ uri: avatar }} />
-        ) : (
-          <Avatar.Icon size={size - borderWidth} icon={"account"} />
-        )}
+        <CustomAvatar size={size - borderWidth} photo={photo} />
       </View>
     </Marker>
   );

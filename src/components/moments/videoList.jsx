@@ -13,11 +13,6 @@ function VideoList(props) {
   return (
     <Pressable onPress={() => onPress(id)}>
       <View style={[styles.container, selected ? styles.selected : null]}>
-        {photo ? (
-          <Avatar.Image size={25} source={{ uri: photo }} />
-        ) : (
-          <Avatar.Icon size={25} icon={"account"} />
-        )}
         <CustomAvatar size={25} photo={photo} />
         <CustomText style={styles.description}>
           {preparedDescription}

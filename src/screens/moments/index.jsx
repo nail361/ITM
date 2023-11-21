@@ -113,14 +113,6 @@ function Moments() {
     setSotrDirection((prevState) => prevState * -1);
   }
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Loading />
-      </View>
-    );
-  }
-
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {video && (
@@ -242,6 +234,8 @@ function Moments() {
         </Pressable>
       </View>
       <FlatList
+        refreshing={loading}
+        onRefresh={fetchVideos}
         style={styles.videoList}
         numColumns={1}
         data={orderedVideos}

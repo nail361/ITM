@@ -8,8 +8,12 @@ import CustomButton from "../ui/button";
 import CustomText from "../ui/text";
 import CustomAvatar from "../ui/avatar";
 
+const MAX_FOLLOWERS = 10000000;
+
 function Popularity(props) {
-  const percent = 50;
+  const { likes, dislikes, followers } = props;
+
+  const percent = 50; // придумать формулу
   const max_width = 75;
   const width = max_width * (Math.abs(percent) / 100);
   const borderRadius = 10;
@@ -61,6 +65,8 @@ export default function UserInfo(props) {
 
   const about = useSelector((state) => state.profile.about);
   const photo = useSelector((state) => state.profile.photo);
+  const likes = useSelector((state) => state.profile.likes);
+  const dislikes = useSelector((state) => state.profile.dislikes);
   const followers = useSelector((state) => state.profile.followers);
   const following = useSelector((state) => state.profile.following);
 
@@ -91,7 +97,7 @@ export default function UserInfo(props) {
         </Pressable>
         <View style={styles.counterContainer}>
           <CustomText>Popularity</CustomText>
-          <Popularity />
+          <Popularity likes={likes} dislikes={dislikes} followers={followers} />
         </View>
         <Pressable style={styles.counterContainer} onPress={onFollowersPress}>
           <CustomText style={styles.counter}>{followers.length}</CustomText>
@@ -113,6 +119,7 @@ export default function UserInfo(props) {
 const styles = StyleSheet.create({
   container: {
     alignItems: "center",
+    paddingHorizontal: 10,
   },
   aboutText: {
     marginVertical: 10,
@@ -143,7 +150,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     marginVertical: 20,
-    width: "95%",
+    width: "100%",
     borderBottomWidth: 1,
     borderColor: "lightgray",
   },

@@ -10,6 +10,7 @@ import {
   TouchableOpacity,
   Pressable,
   Alert,
+  Dimensions,
 } from "react-native";
 
 import { Colors } from "../../utils/colors";
@@ -17,19 +18,25 @@ import { getMyVideos, removeVideo, getServerTime } from "../../utils/db";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
 
+const HORIZONTAL_PADDING = 15;
+
 function Video(props) {
   const { showPreview, serverTime } = props;
   const { id, videoUrl, thumbnailUrl, expireAt, likes, dislikes, privacy } =
     props.data;
 
-  const max_with = 80;
+  const windowWidth = Dimensions.get("window").width;
+  const videoWidth = windowWidth / 3 - 15;
+  const videoHeight = videoWidth;
+
+  const max_with = videoWidth - 40;
   let current_with = (max_with * (expireAt - serverTime)) / 3600;
   current_with = Math.max(1, current_with);
   current_with = Math.min(max_with, current_with);
 
   return (
     <TouchableOpacity
-      style={styles.video}
+      style={[styles.video, { width: videoWidth, height: videoHeight }]}
       onPress={() => showPreview({ videoUrl, privacy, id })}
     >
       <Image style={styles.thumbnail} source={{ uri: thumbnailUrl }} />
@@ -67,7 +74,10 @@ export default function MyMoments() {
   }, []);
 
   async function fetchVideos() {
+    setLoading(true);
+    console.log("Fetching");
     const response = await getMyVideos();
+
     setVideos(response);
 
     const serverTime = await getServerTime();
@@ -108,14 +118,6 @@ export default function MyMoments() {
     fetchVideos();
   }
 
-  if (loading) {
-    return (
-      <View style={styles.container}>
-        <Loading />
-      </View>
-    );
-  }
-
   return (
     <View style={styles.container}>
       {preview && (
@@ -134,7 +136,7 @@ export default function MyMoments() {
             style={styles.removeBtn}
             onPress={() => onVideoRemoveConfirm(preview.id)}
           >
-            <Entypo name="cup" size={35} color="white" />
+            <Entypo name="cup" size={25} color="white" />
           </Pressable>
           <Pressable
             style={styles.videoPreviewWrapper}
@@ -156,7 +158,13 @@ export default function MyMoments() {
         </>
       )}
       <FlatList
+        refreshing={loading}
+        onRefresh={fetchVideos}
         contentContainerStyle={styles.videos}
+        columnWrapperStyle={{
+          justifyContent: "flex-start",
+          marginBottom: 10,
+        }}
         numColumns={3}
         removeClippedSubviews
         data={videos}
@@ -176,19 +184,15 @@ export default function MyMoments() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    paddingHorizontal: HORIZONTAL_PADDING,
   },
-  videos: {
-    flex: 1,
-  },
+  videos: {},
   video: {
-    flex: 1 / 3,
-    width: 100,
-    height: 100,
     backgroundColor: "grey",
-    marginHorizontal: 5,
     position: "relative",
     borderWidth: 1,
     borderColor: Colors.mainColor,
+    marginRight: 10,
   },
   thumbnail: {
     flex: 1,
@@ -219,7 +223,7 @@ const styles = StyleSheet.create({
   },
   videoPreviewWrapper: {
     position: "absolute",
-    left: 0,
+    left: HORIZONTAL_PADDING,
     top: 0,
     width: "100%",
     height: "100%",
@@ -270,12 +274,12 @@ const styles = StyleSheet.create({
   removeBtn: {
     position: "absolute",
     bottom: 15,
-    right: 20,
+    right: 25,
     zIndex: 2,
     backgroundColor: Colors.mainColor,
     borderRadius: 50,
-    width: 50,
-    height: 50,
+    width: 40,
+    height: 40,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -284,7 +288,7 @@ const styles = StyleSheet.create({
     flexDirection: "column",
     alignItems: "center",
     top: 10,
-    right: 15,
+    right: 20,
     zIndex: 2,
   },
   privacyText: {
