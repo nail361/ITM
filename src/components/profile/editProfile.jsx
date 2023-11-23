@@ -1,4 +1,3 @@
-import { useNavigation } from "@react-navigation/native";
 import { useState } from "react";
 import { View, Alert, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
@@ -7,9 +6,9 @@ import { authActions } from "../../store/auth";
 import { profileActions } from "../../store/profile";
 import { logoutUser, saveMyInfo } from "../../utils/db";
 import CustomButton from "../ui/button";
-import CustomTextInput from "../ui/textInput";
-import CustomText from "../ui/text";
 import Loading from "../ui/loading";
+import CustomText from "../ui/text";
+import CustomTextInput from "../ui/textInput";
 
 const MAX_ABOUT_SYMBOLS = 100;
 
@@ -21,7 +20,6 @@ export default function EditProfile() {
   const [loader, setLoader] = useState(false);
 
   const dispatch = useDispatch();
-  const navigation = useNavigation();
 
   function onAboutChange(aboutText) {
     if (aboutText.length > MAX_ABOUT_SYMBOLS) {
@@ -51,8 +49,6 @@ export default function EditProfile() {
 
     if (response === true) {
       dispatch(authActions.logout());
-      //@ts-ignore
-      navigation.replace("Auth");
     } else {
       Alert.alert(response?.error);
     }

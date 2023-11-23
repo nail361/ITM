@@ -101,7 +101,7 @@ export default function App() {
   function Tabs() {
     return (
       <Tab.Navigator
-        initialRouteName="Profile"
+        initialRouteName="MyProfile"
         screenOptions={{
           tabBarActiveTintColor: Colors.secondColor,
           headerShown: false,
@@ -111,7 +111,6 @@ export default function App() {
           name="Moments"
           component={Moments}
           options={{
-            title: "Moments",
             tabBarIcon: ({ color, size }) => (
               <Entypo name="video" size={24} color={color} />
             ),
@@ -121,17 +120,15 @@ export default function App() {
           name="Record"
           component={Moment}
           options={{
-            title: "Record",
             tabBarIcon: ({ color, size }) => (
               <Entypo name="video-camera" size={24} color={color} />
             ),
           }}
         />
         <Tab.Screen
-          name="Profile"
+          name="MyProfile"
           component={Profile}
           options={{
-            title: "My Profile",
             tabBarIcon: ({ color, size }) => (
               <Entypo name="v-card" size={24} color={color} />
             ),
@@ -160,14 +157,19 @@ export default function App() {
         <View onLayout={onLayoutRootView} style={styles.mainView}>
           <NavigationContainer>
             <Stack.Navigator
-              initialRouteName={isAuth ? "Main" : "Auth"}
               screenOptions={{
                 headerBackVisible: false,
                 headerShown: false,
               }}
             >
-              <Stack.Screen name="Auth" component={Auth} />
-              <Stack.Screen name="Main" component={Tabs} />
+              {!isAuth ? (
+                <Stack.Screen name="Auth" component={Auth} />
+              ) : (
+                <>
+                  <Stack.Screen name="Main" component={Tabs} />
+                  <Stack.Screen name="UserProfile" component={Profile} />
+                </>
+              )}
             </Stack.Navigator>
           </NavigationContainer>
           <StatusBar style="auto" />

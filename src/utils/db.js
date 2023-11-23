@@ -4,13 +4,15 @@ import {
   _logoutUser,
   _loginUser,
   _publishVideo,
-  _getMyVideos,
+  _getUserVideos,
   _removeVideo,
   _getServerTime,
   _getNearVideos,
-  _getMyInfo,
+  _getUserInfo,
   _saveMyInfo,
   _getUsersInfo,
+  _getFollowing,
+  _getFollowers,
 } from "./parse-server";
 
 export function init() {
@@ -33,8 +35,8 @@ export async function publishVideo(video, thumbnail, data, callback) {
   return await _publishVideo(video, thumbnail, data, callback);
 }
 
-export async function getMyVideos() {
-  return await _getMyVideos();
+export async function getUserVideos(uid) {
+  return await _getUserVideos(uid);
 }
 
 export async function removeVideo(id) {
@@ -49,8 +51,8 @@ export async function getNearVideos(location, radius, onlyFirends) {
   return await _getNearVideos(location, radius, onlyFirends);
 }
 
-export async function getMyInfo() {
-  return await _getMyInfo();
+export async function getUserInfo(uid) {
+  return await _getUserInfo(uid);
 }
 
 export async function saveMyInfo(data) {
@@ -59,4 +61,12 @@ export async function saveMyInfo(data) {
 
 export async function getUsersInfo(uids, data) {
   return await _getUsersInfo(uids, data);
+}
+
+export async function getFollowing(uid) {
+  return await _getFollowing(uid);
+}
+
+export async function getFollowers(uid) {
+  return await _getFollowers(uid);
 }

@@ -137,8 +137,10 @@ export async function _getNearVideos(location, radius) {
   });
 }
 
-export async function _getMyVideos() {
-  const uid = await getUserId();
+export async function _getUserVideos(_uid) {
+  let uid = _uid;
+  if (!uid) uid = await getUserId();
+
   return await Parse.Cloud.run("getUserVideos", {
     uid,
   });
@@ -148,8 +150,9 @@ export async function _removeVideo(id) {
   return await Parse.Cloud.run("deleteVideo", { id });
 }
 
-export async function _getMyInfo() {
-  const uid = await getUserId();
+export async function _getUserInfo(_uid) {
+  let uid = _uid;
+  if (!uid) uid = await getUserId();
 
   return {
     about: "Обо мне заглушка",
@@ -160,10 +163,10 @@ export async function _getMyInfo() {
     followers: ["1", "3"],
     following: ["1", "2", "3"],
   };
-
+  /*
   return await Parse.Cloud.run("getUserInfo", {
     uid,
-  });
+  });*/
 }
 
 export async function _getUsersInfo(uids, data) {
@@ -188,4 +191,18 @@ export async function _getUsersInfo(uids, data) {
 
 export async function _saveMyInfo() {
   return true;
+}
+
+export async function _getFollowing(_uid) {
+  let uid = _uid;
+  if (!uid) uid = await getUserId();
+
+  return ["1", "2", "3"];
+}
+
+export async function _getFollowers(_uid) {
+  let uid = _uid;
+  if (!uid) uid = await getUserId();
+
+  return ["1", "2", "3"];
 }

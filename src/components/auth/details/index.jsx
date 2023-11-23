@@ -1,19 +1,17 @@
-import { useNavigation } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { View, Text, Pressable, Alert } from "react-native";
 import { useDispatch } from "react-redux";
 
 import styles from "./styles";
 import { authActions } from "../../../store/auth";
+import { Colors } from "../../../utils/colors";
 import { createUser, loginUser } from "../../../utils/db";
 import CustomButton from "../../ui/button";
 import Loading from "../../ui/loading";
 import CustomTextInput from "../../ui/textInput";
-import { Colors } from "../../../utils/colors";
 
 export default function AuthDetails(props) {
   const { route } = props;
-  const navigation = useNavigation();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -58,7 +56,6 @@ export default function AuthDetails(props) {
           username: response.username,
         }),
       );
-      navigation.replace("Main");
     }
 
     setLoading(false);
@@ -72,7 +69,6 @@ export default function AuthDetails(props) {
       Alert.alert(response.error);
     } else {
       dispatch(authActions.login({ ...response }));
-      navigation.replace("Main");
     }
 
     setLoading(false);

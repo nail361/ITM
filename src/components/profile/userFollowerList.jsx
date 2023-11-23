@@ -1,5 +1,5 @@
-import { useCallback } from "react";
 import { Entypo } from "@expo/vector-icons";
+import { useCallback } from "react";
 import { View, StyleSheet, Pressable } from "react-native";
 
 import { Colors } from "../../utils/colors";
@@ -8,19 +8,20 @@ import CustomText from "../ui/text";
 
 export default function UserFolowerList(props) {
   const {
-    followers,
+    followings,
     uid,
     photo,
     name,
     onUserSelect,
     onRemoveHandler,
     onSubscribe,
+    showRemove,
   } = props;
 
-  const isUserFollower = useCallback(() => {
-    if (followers == null) return false;
-    return followers.includes(uid);
-  }, [followers, uid]);
+  const isUserAlreadySubscribed = useCallback(() => {
+    if (followings == null) return false;
+    return followings.includes(uid);
+  }, [followings, uid]);
 
   return (
     <Pressable style={styles.user} onPress={() => onUserSelect(uid)}>
@@ -28,15 +29,17 @@ export default function UserFolowerList(props) {
         <CustomAvatar size={30} photo={photo} />
         <CustomText style={styles.nameText}>{name}</CustomText>
       </View>
-      {onSubscribe && !isUserFollower() && (
+      {!isUserAlreadySubscribed() && (
         <Pressable style={styles.subscribe} onPress={() => onSubscribe(uid)}>
           <CustomText style={styles.subscribeText}>Подписаться</CustomText>
           <Entypo name="add-to-list" size={20} color="white" />
         </Pressable>
       )}
-      <Pressable style={styles.trash} onPress={() => onRemoveHandler(uid)}>
-        <Entypo name="trash" size={20} color={Colors.bgColor} />
-      </Pressable>
+      {showRemove && (
+        <Pressable style={styles.trash} onPress={() => onRemoveHandler(uid)}>
+          <Entypo name="trash" size={20} color={Colors.bgColor} />
+        </Pressable>
+      )}
     </Pressable>
   );
 }

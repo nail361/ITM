@@ -1,0 +1,7 @@
+{
+  "notebook.codeActionsOnSave": {},
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.fixAllE": true
+  }
+}

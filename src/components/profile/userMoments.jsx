@@ -1,4 +1,5 @@
 import { Entypo } from "@expo/vector-icons";
+import { useRoute } from "@react-navigation/native";
 import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect, useRef } from "react";
@@ -14,7 +15,7 @@ import {
 } from "react-native";
 
 import { Colors } from "../../utils/colors";
-import { getMyVideos, removeVideo, getServerTime } from "../../utils/db";
+import { getUserVideos, removeVideo, getServerTime } from "../../utils/db";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
 
@@ -22,8 +23,16 @@ const HORIZONTAL_PADDING = 15;
 
 function Video(props) {
   const { showPreview, serverTime } = props;
-  const { id, videoUrl, thumbnailUrl, expireAt, likes, dislikes, privacy } =
-    props.data;
+  const {
+    id,
+    videoUrl,
+    thumbnailUrl,
+    expireAt,
+    likes,
+    dislikes,
+    privacy,
+    location,
+  } = props.data;
 
   const windowWidth = Dimensions.get("window").width;
   const videoWidth = windowWidth / 3 - 15;
@@ -37,7 +46,9 @@ function Video(props) {
   return (
     <TouchableOpacity
       style={[styles.video, { width: videoWidth, height: videoHeight }]}
-      onPress={() => showPreview({ videoUrl, privacy, id })}
+      onPress={() =>
+        showPreview({ videoUrl, likes, dislikes, privacy, id, location })
+      }
     >
       <Image style={styles.thumbnail} source={{ uri: thumbnailUrl }} />
       <Entypo style={styles.timer} name="stopwatch" size={20} color="white" />
@@ -61,66 +72,20 @@ function Video(props) {
   );
 }
 
-export default function MyMoments() {
-  const [videos, setVideos] = useState([]);
-  const [preview, setPreview] = useState(null);
-  const [loading, setLoading] = useState(true);
+function Preview(props) {
+  const { preview, myProfile, onVideoClose, onVideoRemove } = props;
   const [videoLoading, setVideoLoading] = useState(true);
   const videoPlayer = useRef(null);
-  const [serverTime, setServerTime] = useState(0);
-
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  async function fetchVideos() {
-    setLoading(true);
-    console.log("Fetching");
-    const response = await getMyVideos();
-
-    setVideos(response);
-
-    const serverTime = await getServerTime();
-    setServerTime(serverTime);
-
-    setLoading(false);
-  }
-
-  function showPreview(url) {
-    setPreview(url);
-    setVideoLoading(true);
-  }
 
   function videoLoaded() {
     setVideoLoading(false);
     videoPlayer.current.playAsync();
   }
 
-  function onVideoRemoveConfirm(videoId) {
-    Alert.alert("Remove video", "Are you sure to remove video?", [
-      {
-        text: "Cancel",
-      },
-      { text: "OK", onPress: () => onVideoRemove(videoId) },
-    ]);
-  }
-
-  async function onVideoRemove(videoId) {
-    setLoading(true);
-
-    const response = await removeVideo(videoId);
-    if (response.error) {
-      Alert.alert(response.error);
-    }
-
-    setPreview(null);
-
-    fetchVideos();
-  }
-
   return (
-    <View style={styles.container}>
-      {preview && (
+    <>
+      {/* <View style={styles.map}></View> */}
+      {myProfile && (
         <>
           <View style={styles.privacy}>
             <Entypo
@@ -132,30 +97,110 @@ export default function MyMoments() {
               {preview.privacy}
             </CustomText>
           </View>
+
           <Pressable
             style={styles.removeBtn}
-            onPress={() => onVideoRemoveConfirm(preview.id)}
+            onPress={() => onVideoRemove(preview.id)}
           >
             <Entypo name="cup" size={25} color="white" />
           </Pressable>
-          <Pressable
-            style={styles.videoPreviewWrapper}
-            onPress={() => setPreview(null)}
-          >
-            <VideoPlayer
-              ref={videoPlayer}
-              style={styles.videoPreview}
-              source={{
-                uri: preview.videoUrl,
-              }}
-              useNativeControls={false}
-              resizeMode={ResizeMode.CONTAIN}
-              isLooping
-              onLoad={videoLoaded}
-            />
-            {videoLoading && <Loading style={styles.videoLoading} />}
+        </>
+      )}
+      {!myProfile && (
+        <>
+          <Pressable>
+            <Entypo name="thumbs-up" size={16} color="white" />
+            <CustomText style={styles.likeText}>{preview.likes}</CustomText>
+          </Pressable>
+          <Pressable>
+            <Entypo name="thumbs-down" size={16} color="white" />
+            <CustomText style={styles.dislikeText}>
+              {preview.dislikes}
+            </CustomText>
           </Pressable>
         </>
+      )}
+      <Pressable style={styles.videoPreviewWrapper} onPress={onVideoClose}>
+        <VideoPlayer
+          ref={videoPlayer}
+          style={styles.videoPreview}
+          source={{
+            uri: preview.videoUrl,
+          }}
+          useNativeControls={false}
+          resizeMode={ResizeMode.CONTAIN}
+          isLooping
+          onLoad={videoLoaded}
+        />
+        {videoLoading && <Loading style={styles.videoLoading} />}
+      </Pressable>
+    </>
+  );
+}
+
+export default function UserMoments() {
+  const { profileRoute } = useRoute().params;
+  const [videos, setVideos] = useState([]);
+  const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [serverTime, setServerTime] = useState(0);
+
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  async function fetchVideos() {
+    setLoading(true);
+    let response = null;
+    if (profileRoute.name === "MyProfile") response = await getUserVideos();
+    else response = await getUserVideos(profileRoute.params.uid);
+
+    setVideos(response);
+
+    const serverTime = await getServerTime();
+    setServerTime(serverTime);
+
+    setLoading(false);
+  }
+
+  function showPreview(data) {
+    setPreview(data);
+  }
+
+  function onVideoRemoveConfirm(videoId) {
+    Alert.alert("Remove video", "Are you sure to remove video?", [
+      {
+        text: "Cancel",
+      },
+      { text: "OK", onPress: () => onVideoRemove(videoId) },
+    ]);
+  }
+
+  function onVideoClose() {
+    setPreview(null);
+  }
+
+  async function onVideoRemove(videoId) {
+    setLoading(true);
+
+    const response = await removeVideo(videoId);
+    if (response.error) {
+      Alert.alert(response.error);
+    }
+
+    setPreview(null);
+    fetchVideos();
+  }
+
+  return (
+    <View style={styles.container}>
+      {preview && (
+        <Preview
+          preview={preview}
+          myProfile={profileRoute.name === "MyProfile"}
+          onVideoRemove={onVideoRemoveConfirm}
+          onVideoClose={onVideoClose}
+        />
       )}
       <FlatList
         refreshing={loading}
@@ -293,5 +338,12 @@ const styles = StyleSheet.create({
   },
   privacyText: {
     color: "white",
+  },
+  map: {
+    position: "absolute",
+    width: "100%",
+    height: "100%",
+    top: -50,
+    backgroundColor: "black",
   },
 });

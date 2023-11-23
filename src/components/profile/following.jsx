@@ -1,25 +1,53 @@
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
 import { View, FlatList, StyleSheet, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
-import { profileActions } from "../../store/profile";
-import Loading from "../ui/loading";
-import { getUsersInfo } from "../../utils/db";
+
 import UserFollowerList from "./userFollowerList";
+import { profileActions } from "../../store/profile";
+import { getUsersInfo, getFollowing } from "../../utils/db";
 
 // Подписки
 export default function Following() {
-  const followingUids = useSelector((state) => state.profile.following);
+  const { profileRoute } = useRoute().params;
+
+  let followingUids = [];
+
+  if (profileRoute.name === "MyProfile")
+    followingUids = useSelector((state) => state.profile.following);
+
   const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const dispatch = useDispatch();
+  const navigation = useNavigation();
 
   useEffect(() => {
+    if (profileRoute.name === "UserProfile") {
+      // navigation.getParent().setOptions({
+      //   headerShown: false,
+      // });
+      navigation.setOptions({
+        title: `Подписки ${profileRoute.params.uid}`,
+      });
+    }
+
     fetchFollowing();
   }, []);
 
   async function fetchFollowing() {
     setLoading(true);
+
+    if (profileRoute.name === "UserProfile") {
+      followingUids = await getFollowing(profileRoute.params.uid);
+
+      if (followingUids.error) {
+        Alert.alert(followingUids.error);
+        setLoading(false);
+        return;
+      }
+    }
+
     const response = await getUsersInfo(followingUids);
 
     if (response.error) {
@@ -32,7 +60,9 @@ export default function Following() {
   }
 
   function onUserSelect(uid) {
-    console.log(uid);
+    if (profileRoute.name === "MyProfile")
+      navigation.navigate("UserProfile", { uid });
+    else navigation.replace("UserProfile", { uid });
   }
 
   function onUnsubscribeConfirm(uid) {
@@ -51,16 +81,15 @@ export default function Following() {
     setUsers(newUsers);
   }
 
-  if (loading) {
-    return (
-      <View style={{ flex: 1 }}>
-        <Loading />
-      </View>
-    );
+  function onSubscribe(uid) {
+    console.log(`subscribe ${uid}`);
+    //await server
+    dispatch(profileActions.updateFollowing([...followingUids, uid]));
   }
 
   return (
     <FlatList
+      refreshing={loading}
       style={styles.list}
       numColumns={1}
       data={users}
@@ -68,8 +97,11 @@ export default function Following() {
       renderItem={({ item }) => (
         <UserFollowerList
           {...item}
+          followings={followingUids}
           onUserSelect={onUserSelect}
           onRemoveHandler={onUnsubscribeConfirm}
+          onSubscribe={onSubscribe}
+          showRemove={profileRoute.name === "MyProfile"}
         />
       )}
     />

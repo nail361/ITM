@@ -1,12 +1,14 @@
-import { useNavigation } from "@react-navigation/native";
-import React from "react";
-import { StyleSheet, View, Pressable } from "react-native";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import React, { useEffect, useState } from "react";
+import { StyleSheet, View, Pressable, Alert } from "react-native";
 import { useSelector } from "react-redux";
 
 import { Colors } from "../../utils/colors";
-import CustomButton from "../ui/button";
-import CustomText from "../ui/text";
+import { getUserInfo } from "../../utils/db";
 import CustomAvatar from "../ui/avatar";
+import CustomButton from "../ui/button";
+import Loading from "../ui/loading";
+import CustomText from "../ui/text";
 
 const MAX_FOLLOWERS = 10000000;
 
@@ -60,35 +62,81 @@ function Popularity(props) {
 }
 
 export default function UserInfo(props) {
-  const name = useSelector((state) => state.auth.username);
-  const email = useSelector((state) => state.auth.email);
+  const { profileRoute } = useRoute().params;
+  const [loading, setLoading] = useState(false);
 
-  const about = useSelector((state) => state.profile.about);
-  const photo = useSelector((state) => state.profile.photo);
-  const likes = useSelector((state) => state.profile.likes);
-  const dislikes = useSelector((state) => state.profile.dislikes);
-  const followers = useSelector((state) => state.profile.followers);
-  const following = useSelector((state) => state.profile.following);
+  let name = "";
+
+  let about = "";
+  let photo = "";
+  let likes = "";
+  let dislikes = "";
+  let followers = "";
+  let following = "";
+
+  if (profileRoute.name === "MyProfile") {
+    name = useSelector((state) => state.auth.username);
+
+    about = useSelector((state) => state.profile.about);
+    photo = useSelector((state) => state.profile.photo);
+    likes = useSelector((state) => state.profile.likes);
+    dislikes = useSelector((state) => state.profile.dislikes);
+    followers = useSelector((state) => state.profile.followers);
+    following = useSelector((state) => state.profile.following);
+  }
+
+  useEffect(() => {
+    if (profileRoute.name === "UserProfile") {
+      fetchUserInfo();
+    }
+  }, []);
+
+  async function fetchUserInfo() {
+    setLoading(true);
+
+    const response = await getUserInfo(profileRoute.params.uid);
+    if (response.error) {
+      Alert.alert(response.error);
+    } else {
+      name = response.name;
+
+      about = response.about;
+      photo = response.photo;
+      likes = response.likes;
+      dislikes = response.dislikes;
+      followers = response.followers;
+      followers = response.followers;
+    }
+
+    setLoading(false);
+  }
 
   const navigation = useNavigation();
 
   function onEditProfile() {
-    navigation.push("editProfile");
+    navigation.navigate("editProfile");
   }
 
   function onFollowingPress() {
-    navigation.push("following");
+    navigation.navigate("following");
   }
 
   function onFollowersPress() {
-    navigation.push("followers");
+    navigation.navigate("followers");
+  }
+
+  if (loading) {
+    return (
+      <View style={styles.container}>
+        <Loading />
+      </View>
+    );
   }
 
   return (
     <View style={styles.container}>
       <CustomText>{name}</CustomText>
       <CustomAvatar size={80} photo={photo} />
-      <CustomText style={styles.emailText}>{email}</CustomText>
       <CustomText style={styles.aboutText}>{about}</CustomText>
       <View style={styles.statistic}>
         <Pressable style={styles.counterContainer} onPress={onFollowingPress}>
@@ -104,13 +152,15 @@ export default function UserInfo(props) {
           <CustomText style={styles.counterText}>Followers</CustomText>
         </Pressable>
       </View>
-      <CustomButton
-        style={styles.editBtn}
-        mode={"outlined"}
-        onPress={onEditProfile}
-      >
-        Edit Profile
-      </CustomButton>
+      {profileRoute.name === "MyProfile" && (
+        <CustomButton
+          style={styles.editBtn}
+          mode={"outlined"}
+          onPress={onEditProfile}
+        >
+          Edit Profile
+        </CustomButton>
+      )}
       <View style={styles.divider} />
     </View>
   );
@@ -122,9 +172,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
   },
   aboutText: {
-    marginVertical: 10,
-  },
-  emailText: {
     marginVertical: 10,
   },
   statistic: {

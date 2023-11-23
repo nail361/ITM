@@ -1,10 +1,12 @@
+import { useRoute } from "@react-navigation/native";
 import { View, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
-import MyMoments from "./myMoments";
 import UserInfo from "./userInfo";
+import UserMoments from "./userMoments";
 
 export default function MainProfile() {
+  const { profileRoute } = useRoute().params;
   const insets = useSafeAreaInsets();
 
   return (
@@ -12,12 +14,12 @@ export default function MainProfile() {
       style={[
         styles.container,
         {
-          paddingTop: insets.top + 10,
+          paddingTop: profileRoute.name === "MyProfile" ? insets.top + 10 : 10,
         },
       ]}
     >
-      <UserInfo />
-      <MyMoments />
+      <UserInfo profileRoute={profileRoute} />
+      <UserMoments profileRoute={profileRoute} />
     </View>
   );
 }
