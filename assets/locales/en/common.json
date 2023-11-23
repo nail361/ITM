@@ -1,3 +1,76 @@
 {
-  "test": "Test 11222"
+  "common": {
+    "moments": "Moments",
+    "record": "Record",
+    "profile": "Profile",
+    "location_permission": {
+      "text": "You cannot use the application without a location",
+      "btn": "Give a permission"
+    }
+  },
+  "auth": {
+    "sign_in_title": "Sign in",
+    "sign_up_title": "Sign up",
+    "sign_up": "Sign up",
+    "sign_in": "Sign in",
+    "sign_in_btn": "Sign in",
+    "sign_up_btn": "Sign up",
+    "use_email": "Use Email",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?",
+    "name_field": "Name",
+    "email_field": "Email",
+    "password_field": "Password"
+  },
+  "moment": {
+    "public_btn_label": "PUBLIC",
+    "private_btn_label": "PRIVATE",
+    "lifetime": "Lifetime",
+    "15m": "15m",
+    "30m": "30m",
+    "45m": "45m",
+    "60m": "1h",
+    "submit_publish": "Publish",
+    "cancel_publish": "Cancel",
+    "description": "Moment's description"
+  },
+  "moments": {
+    "location_error": "Need location enabled to app works",
+    "world_btn_label": "WORLD",
+    "local_btn_label": "LOCAL",
+    "only_following": "only following",
+    "sort_by_time": "time",
+    "sort_by_popularity": "popularity"
+  },
+  "profile": {
+    "profile_header": "Return to my profile",
+    "edit_profile_header": "Edit profile",
+    "edit_profile_btn": "Edit profile",
+    "followers": "Followers",
+    "following": "Following",
+    "subscribe": "subscribe",
+    "popularity": "Popularity",
+    "about": "About",
+    "about_save_btn": "Save changes",
+    "logout_btn": "Logout",
+    "max_symbols": "Max symbols",
+    "delete_follower_confirm": {
+      "header": "Remove follower",
+      "text": "Are you sure to remove user from your followers?",
+      "submit": "OK",
+      "cancel": "CANCEL"
+    },
+    "unsubscribe_follower_confirm": {
+      "header": "Unsubscribe",
+      "text": "You want to unsubscribe from user?",
+      "submit": "OK",
+      "cancel": "CANCEL"
+    },
+    "remove_video_confirm": {
+      "header": "Remove video",
+      "text": "Are you sure to remove video?",
+      "submit": "OK",
+      "cancel": "CANCEL"
+    }
+  }
 }

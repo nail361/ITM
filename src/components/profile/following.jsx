@@ -1,5 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View, FlatList, StyleSheet, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -9,6 +10,7 @@ import { getUsersInfo, getFollowing } from "../../utils/db";
 
 // Подписки
 export default function Following() {
+  const { t } = useTranslation();
   const { profileRoute } = useRoute().params;
 
   let followingUids = [];
@@ -28,7 +30,7 @@ export default function Following() {
       //   headerShown: false,
       // });
       navigation.setOptions({
-        title: `Подписки ${profileRoute.params.uid}`,
+        title: `${t("profile.following")} ${profileRoute.params.uid}`,
       });
     }
 
@@ -66,12 +68,19 @@ export default function Following() {
   }
 
   function onUnsubscribeConfirm(uid) {
-    Alert.alert("Unsubscribe", "Are you sure to unsubscribe?", [
-      {
-        text: "Cancel",
-      },
-      { text: "OK", onPress: () => onUnsubscribe(uid) },
-    ]);
+    Alert.alert(
+      t("profile.unsubscribe_follower_confirm.header"),
+      t("profile.unsubscribe_follower_confirm.text"),
+      [
+        {
+          text: t("profile.unsubscribe_follower_confirm.cancel"),
+        },
+        {
+          text: t("profile.unsubscribe_follower_confirm.sumbit"),
+          onPress: () => onUnsubscribe(uid),
+        },
+      ],
+    );
   }
 
   function onUnsubscribe(uid) {

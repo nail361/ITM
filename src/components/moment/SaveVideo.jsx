@@ -3,13 +3,16 @@ import { Video, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import { useEffect, useState, useRef } from "react";
-import { View, Text, StyleSheet, Pressable, TextInput } from "react-native";
+import { useTranslation } from "react-i18next";
+import { View, StyleSheet, Pressable } from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 
 import UploadProgress from "./UploadProgress";
 import { Colors } from "../../utils/colors";
 import { publishVideo } from "../../utils/db";
 import CustomButton from "../ui/button";
+import CustomText from "../ui/text";
+import CustomTextInput from "../ui/textInput";
 
 export default function SaveVideo(props) {
   const [status, setStatus] = useState({});
@@ -20,6 +23,7 @@ export default function SaveVideo(props) {
   const [videoLifetime, setLifetime] = useState(30);
   const video = useRef(null);
   const { videoUri, cancelPublish } = props;
+  const { t } = useTranslation();
 
   useEffect(() => {
     video.current.playAsync();
@@ -104,11 +108,11 @@ export default function SaveVideo(props) {
         />
       </View>
       <View style={styles.videoInfo}>
-        <TextInput
+        <CustomTextInput
           style={styles.description}
           maxLength={150}
           multiline
-          placeholder="Description"
+          label={t("moment.description")}
           value={videoDescription}
           onChangeText={(text) => setDesctiption(text)}
         />
@@ -119,14 +123,14 @@ export default function SaveVideo(props) {
             buttons={[
               {
                 value: "public",
-                label: "PUBLIC",
+                label: t("moment.public_btn_label"),
                 icon: "lock-open-variant-outline",
                 checkedColor: "white",
                 uncheckedColor: "grey",
               },
               {
                 value: "private",
-                label: "PRIVATE",
+                label: t("moment.private_btn_label"),
                 icon: "lock-outline",
                 checkedColor: "white",
                 uncheckedColor: "grey",
@@ -135,12 +139,20 @@ export default function SaveVideo(props) {
           />
         </View>
         <View style={styles.lifetimeWrapper}>
-          <Text style={styles.text}>Lifetime</Text>
+          <CustomText style={styles.text}>{t("moment.lifetime")}</CustomText>
           <View style={styles.sliderTitles}>
-            <Text style={styles.sliderTitle}>15m</Text>
-            <Text style={styles.sliderTitle}>30m</Text>
-            <Text style={styles.sliderTitle}>45m</Text>
-            <Text style={styles.sliderTitle}>1h</Text>
+            <CustomText style={styles.sliderTitle}>
+              {t("moment.15m")}
+            </CustomText>
+            <CustomText style={styles.sliderTitle}>
+              {t("moment.30m")}
+            </CustomText>
+            <CustomText style={styles.sliderTitle}>
+              {t("moment.45m")}
+            </CustomText>
+            <CustomText style={styles.sliderTitle}>
+              {t("moment.60m")}
+            </CustomText>
           </View>
           <Slider
             style={styles.slider}
@@ -157,10 +169,10 @@ export default function SaveVideo(props) {
       </View>
       <View style={styles.buttons}>
         <CustomButton style={styles.w150} onPress={cancelPublish}>
-          {"Cancel"}
+          {t("moment.cancel_publish")}
         </CustomButton>
         <CustomButton style={styles.w150} onPress={onPublish}>
-          {"Publish"}
+          {t("moment.submit_publish")}
         </CustomButton>
       </View>
     </View>
@@ -199,7 +211,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   description: {
-    fontFamily: "ubuntu",
     width: "100%",
     height: 50,
     marginTop: 5,
@@ -209,7 +220,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.lightTextColor,
   },
   text: {
-    fontFamily: "ubuntu",
     color: "white",
     fontSize: 18,
   },
@@ -252,7 +262,6 @@ const styles = StyleSheet.create({
     left: 75,
   },
   sliderTitle: {
-    fontFamily: "ubuntu",
     color: "white",
   },
 });

@@ -1,5 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { StyleSheet, View, Pressable, Alert } from "react-native";
 import { useSelector } from "react-redux";
 
@@ -62,6 +63,8 @@ function Popularity(props) {
 }
 
 export default function UserInfo(props) {
+  const { t } = useTranslation();
+
   const { profileRoute } = useRoute().params;
   const [loading, setLoading] = useState(false);
 
@@ -141,15 +144,19 @@ export default function UserInfo(props) {
       <View style={styles.statistic}>
         <Pressable style={styles.counterContainer} onPress={onFollowingPress}>
           <CustomText style={styles.counter}>{following.length}</CustomText>
-          <CustomText style={styles.counterText}>Following</CustomText>
+          <CustomText style={styles.counterText}>
+            {t("profile.following")}
+          </CustomText>
         </Pressable>
         <View style={styles.counterContainer}>
-          <CustomText>Popularity</CustomText>
+          <CustomText>{t("profile.popularity")}</CustomText>
           <Popularity likes={likes} dislikes={dislikes} followers={followers} />
         </View>
         <Pressable style={styles.counterContainer} onPress={onFollowersPress}>
           <CustomText style={styles.counter}>{followers.length}</CustomText>
-          <CustomText style={styles.counterText}>Followers</CustomText>
+          <CustomText style={styles.counterText}>
+            {t("profile.followers")}
+          </CustomText>
         </Pressable>
       </View>
       {profileRoute.name === "MyProfile" && (
@@ -158,7 +165,7 @@ export default function UserInfo(props) {
           mode={"outlined"}
           onPress={onEditProfile}
         >
-          Edit Profile
+          {t("profile.edit_profile_btn")}
         </CustomButton>
       )}
       <View style={styles.divider} />

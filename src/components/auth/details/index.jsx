@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { View, Text, Pressable, Alert } from "react-native";
+import { useTranslation } from "react-i18next";
+import { View, Alert } from "react-native";
 import { useDispatch } from "react-redux";
 
 import styles from "./styles";
 import { authActions } from "../../../store/auth";
-import { Colors } from "../../../utils/colors";
 import { createUser, loginUser } from "../../../utils/db";
 import CustomButton from "../../ui/button";
 import Loading from "../../ui/loading";
@@ -18,6 +18,7 @@ export default function AuthDetails(props) {
   const [correctData, setCorrectData] = useState(false);
   const dispatch = useDispatch();
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const authPage = route.params.authPage;
 
@@ -42,7 +43,6 @@ export default function AuthDetails(props) {
   async function onCreateUser() {
     setLoading(true);
     const response = await createUser(name, email, password);
-    console.log(response);
 
     if (response.error) {
       Alert.alert(response.error);
@@ -81,7 +81,7 @@ export default function AuthDetails(props) {
       <CustomTextInput
         onChangeText={(text) => setName(text)}
         style={styles.textIn}
-        label="Name"
+        label={t("auth.name_field")}
         inputMode="text"
         value={name}
       />
@@ -89,7 +89,7 @@ export default function AuthDetails(props) {
         <CustomTextInput
           onChangeText={(text) => setEmail(text)}
           style={styles.textIn}
-          label="Email"
+          label={t("auth.email_field")}
           inputMode="email"
           value={email}
         />
@@ -97,12 +97,12 @@ export default function AuthDetails(props) {
       <CustomTextInput
         onChangeText={(text) => setPassword(text)}
         style={styles.textIn}
-        label="Password"
+        label={t("auth.password_field")}
         secureTextEntry={true}
         value={password}
       />
       <CustomButton disabled={!correctData} onPress={onSubmit}>
-        {authPage === 0 ? "Sign In" : "Sign Up"}
+        {authPage === 0 ? t("auth.sign_in_btn") : t("auth.sign_up_btn")}
       </CustomButton>
     </View>
   );

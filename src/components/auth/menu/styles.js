@@ -32,7 +32,6 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   signUpText: {
-    fontFamily: "ubuntu",
     textAlign: "center",
     color: "white",
     paddingTop: 15,

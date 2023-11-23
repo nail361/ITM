@@ -1,5 +1,6 @@
 import { Entypo } from "@expo/vector-icons";
 import { useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { View, StyleSheet, Pressable } from "react-native";
 
 import { Colors } from "../../utils/colors";
@@ -7,6 +8,7 @@ import CustomAvatar from "../ui/avatar";
 import CustomText from "../ui/text";
 
 export default function UserFolowerList(props) {
+  const { t } = useTranslation();
   const {
     followings,
     uid,
@@ -31,7 +33,9 @@ export default function UserFolowerList(props) {
       </View>
       {!isUserAlreadySubscribed() && (
         <Pressable style={styles.subscribe} onPress={() => onSubscribe(uid)}>
-          <CustomText style={styles.subscribeText}>Подписаться</CustomText>
+          <CustomText style={styles.subscribeText}>
+            {t("profile.subscribe")}
+          </CustomText>
           <Entypo name="add-to-list" size={20} color="white" />
         </Pressable>
       )}

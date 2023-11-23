@@ -1,5 +1,6 @@
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View, FlatList, StyleSheet, Alert } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -9,6 +10,7 @@ import { getFollowers, getUsersInfo } from "../../utils/db";
 
 // Подписчики
 export default function Followers() {
+  const { t } = useTranslation();
   const { profileRoute } = useRoute().params;
   const followingUids = useSelector((state) => state.profile.following);
   let followersUids = [];
@@ -27,7 +29,7 @@ export default function Followers() {
       //   headerShown: false,
       // });
       navigation.setOptions({
-        title: `Подписчики ${profileRoute.params.uid}`,
+        title: `${t("profile.followers")} ${profileRoute.params.uid}`,
       });
     }
 
@@ -66,13 +68,16 @@ export default function Followers() {
 
   function onFollowerRemoveConfirm(uid) {
     Alert.alert(
-      "Remove follower",
-      "Are you sure to remove user from your followers?",
+      t("profile.delete_follower_confirm.header"),
+      t("profile.delete_follower_confirm.text"),
       [
         {
-          text: "Cancel",
+          text: t("profile.delete_follower_confirm.cancel"),
         },
-        { text: "OK", onPress: () => onRemoveFollower(uid) },
+        {
+          text: t("profile.delete_follower_confirm.sumbit"),
+          onPress: () => onRemoveFollower(uid),
+        },
       ],
     );
   }

@@ -6,6 +6,7 @@ import {
 } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
 import { Alert, View } from "react-native";
 import { useDispatch } from "react-redux";
 
@@ -21,6 +22,7 @@ const Stack = createNativeStackNavigator();
 
 function Profile() {
   const [loader, setLoader] = useState(false);
+  const { t } = useTranslation();
 
   const dispatch = useDispatch();
   const route = useRoute();
@@ -43,7 +45,7 @@ function Profile() {
     if (route.name === "UserProfile") {
       navigation.setOptions({
         headerShown: true,
-        title: "Выйти из профиля",
+        title: t("profile.profile_header"),
         headerBackVisible: true,
       });
     }
@@ -86,7 +88,7 @@ function Profile() {
           name="editProfile"
           component={EditProfile}
           options={{
-            title: "Редактирование профиля",
+            title: t("profile.edit_profile_header"),
           }}
         />
       )}
@@ -95,7 +97,7 @@ function Profile() {
         component={Followers}
         initialParams={{ profileRoute: route }}
         options={{
-          title: "Подписчики",
+          title: t("profile.followers"),
         }}
       />
       <Stack.Screen
@@ -103,7 +105,7 @@ function Profile() {
         component={Following}
         initialParams={{ profileRoute: route }}
         options={{
-          title: "Подписки",
+          title: t("profile.following"),
         }}
       />
     </Stack.Navigator>

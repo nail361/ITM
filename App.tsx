@@ -10,7 +10,7 @@ import * as Location from "expo-location";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
-import { StyleSheet, View, Text } from "react-native";
+import { StyleSheet, View } from "react-native";
 import {
   MD3LightTheme as DefaultTheme,
   PaperProvider,
@@ -26,7 +26,11 @@ import store from "./src/store";
 import { checkAuth } from "./src/store/auth";
 import { Colors } from "./src/utils/colors";
 import { init as initDB } from "./src/utils/db";
+
 import "./src/utils/i18n";
+import { useTranslation } from "react-i18next";
+
+import CustomText from "./src/components/ui/text";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,6 +38,7 @@ const Stack = createNativeStackNavigator();
 SplashScreen.preventAutoHideAsync();
 
 export default function App() {
+  const { t } = useTranslation();
   const [isAuth, setAuth] = useState(store.getState().auth.isAuth);
   const [locationGranted, setLocationGranted] = useState(false);
   let prevValue = isAuth;
@@ -87,8 +92,10 @@ export default function App() {
   if (!locationGranted) {
     return (
       <View onLayout={onLayoutRootView} style={styles.container}>
-        <Text>You cannot use the application without a location</Text>
-        <CustomButton onPress={openSettings}>Give a permission</CustomButton>
+        <CustomText>{t("common.location_permission.text")}</CustomText>
+        <CustomButton onPress={openSettings}>
+          {t("common.location_permission.btn")}
+        </CustomButton>
         <StatusBar style="auto" />
       </View>
     );
@@ -111,6 +118,7 @@ export default function App() {
           name="Moments"
           component={Moments}
           options={{
+            title: t("common.moments"),
             tabBarIcon: ({ color, size }) => (
               <Entypo name="video" size={24} color={color} />
             ),
@@ -120,6 +128,7 @@ export default function App() {
           name="Record"
           component={Moment}
           options={{
+            title: t("common.record"),
             tabBarIcon: ({ color, size }) => (
               <Entypo name="video-camera" size={24} color={color} />
             ),
@@ -129,6 +138,7 @@ export default function App() {
           name="MyProfile"
           component={Profile}
           options={{
+            title: t("common.profile"),
             tabBarIcon: ({ color, size }) => (
               <Entypo name="v-card" size={24} color={color} />
             ),

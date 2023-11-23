@@ -1,6 +1,7 @@
 import { Entypo } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
 import { Pressable, View } from "react-native";
 
 import styles from "./styles";
@@ -10,10 +11,11 @@ import CustomText from "../../ui/text";
 export default function AuthMenu(props) {
   const { navigation } = props;
   const [authPage, setAuthPage] = useState(0);
+  const { t } = useTranslation();
 
   useEffect(() => {
     navigation.setOptions({
-      title: authPage === 0 ? "Sign in" : "Sign up",
+      title: authPage === 0 ? t("auth.sign_in_title") : t("auth.sign_up_title"),
     });
   }, [navigation, authPage]);
 
@@ -26,7 +28,7 @@ export default function AuthMenu(props) {
         >
           <View style={styles.providerButton}>
             <Entypo name="email" size={24} color="white" />
-            <CustomText style={styles.emailText}>UseEmail</CustomText>
+            <CustomText style={styles.emailText}>t{"use_email"}</CustomText>
           </View>
         </Pressable>
       </View>
@@ -42,18 +44,18 @@ export default function AuthMenu(props) {
         >
           {authPage === 0 ? (
             <CustomText style={styles.signUpText}>
-              Don't have an account?
+              {t("auth.no_account")}
               <CustomText style={[styles.signUpText, styles.boldText]}>
                 {" "}
-                Sign up
+                {t("auth.sign_up")}
               </CustomText>
             </CustomText>
           ) : (
             <CustomText style={styles.signUpText}>
-              Already have an account?
+              {t("auth.have_account")}
               <CustomText style={[styles.signUpText, styles.boldText]}>
                 {" "}
-                Sign in
+                {t("auth.sign_in")}
               </CustomText>
             </CustomText>
           )}

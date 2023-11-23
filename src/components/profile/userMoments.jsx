@@ -3,6 +3,7 @@ import { useRoute } from "@react-navigation/native";
 import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
 import { useState, useEffect, useRef } from "react";
+import { useTranslation } from "react-i18next";
 import {
   View,
   StyleSheet,
@@ -139,6 +140,7 @@ function Preview(props) {
 }
 
 export default function UserMoments() {
+  const { t } = useTranslation();
   const { profileRoute } = useRoute().params;
   const [videos, setVideos] = useState([]);
   const [preview, setPreview] = useState(null);
@@ -168,12 +170,19 @@ export default function UserMoments() {
   }
 
   function onVideoRemoveConfirm(videoId) {
-    Alert.alert("Remove video", "Are you sure to remove video?", [
-      {
-        text: "Cancel",
-      },
-      { text: "OK", onPress: () => onVideoRemove(videoId) },
-    ]);
+    Alert.alert(
+      t("profile.remove_video_confirm.header"),
+      t("profile.remove_video_confirm.text"),
+      [
+        {
+          text: t("profile.remove_video_confirm.cancel"),
+        },
+        {
+          text: t("profile.remove_video_confirm.submit"),
+          onPress: () => onVideoRemove(videoId),
+        },
+      ],
+    );
   }
 
   function onVideoClose() {

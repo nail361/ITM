@@ -37,7 +37,7 @@ function Moments() {
   const [loading, setLoading] = useState(false);
   const [sorting, setSorting] = useState("time");
   const [sortDirection, setSotrDirection] = useState(1);
-  const [t] = useTranslation();
+  const { t } = useTranslation();
 
   const delta = radius / MIN_RADIUS / 100;
 
@@ -66,7 +66,7 @@ function Moments() {
       location = await Location.getLastKnownPositionAsync();
       if (location == null) location = await Location.getCurrentPositionAsync();
     } catch (error) {
-      Alert.alert("Приложение не может работать с выключеной геолокацией");
+      Alert.alert(t("moments.location_error"));
     }
 
     const locationObj = {
@@ -130,14 +130,14 @@ function Moments() {
         buttons={[
           {
             value: "world",
-            label: "WORLD",
+            label: t("moments.world_btn_label"),
             icon: "earth",
             checkedColor: "white",
             uncheckedColor: "grey",
           },
           {
             value: "local",
-            label: "LOCAL",
+            label: t("moments.local_btn_label"),
             icon: "crosshairs-gps",
             checkedColor: "white",
             uncheckedColor: "grey",
@@ -145,7 +145,9 @@ function Moments() {
         ]}
       />
       <View style={[styles.switcherRow, { top: insets.top + 50 }]}>
-        <CustomText style={styles.switcherText}>подписки</CustomText>
+        <CustomText style={styles.switcherText}>
+          {t("moments.only_following")}
+        </CustomText>
         <CustomSwitcher
           value={onlyFollowing}
           onToggle={() => {
@@ -211,7 +213,9 @@ function Moments() {
       />
       <View style={styles.sorting}>
         <Pressable style={styles.sortingRow} onPress={() => onSort("time")}>
-          <CustomText style={styles.sortingText}>время</CustomText>
+          <CustomText style={styles.sortingText}>
+            {t("moments.sort_by_time")}
+          </CustomText>
           {sorting === "time" && (
             <Entypo
               style={styles.sortingDirection}
@@ -222,7 +226,9 @@ function Moments() {
           )}
         </Pressable>
         <Pressable style={styles.sortingRow} onPress={() => onSort("likes")}>
-          <CustomText style={styles.sortingText}>популярность</CustomText>
+          <CustomText style={styles.sortingText}>
+            {t("moments.sort_by_popularity")}
+          </CustomText>
           {sorting === "likes" && (
             <Entypo
               style={styles.sortingDirection}

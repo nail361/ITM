@@ -9,8 +9,6 @@ import Animated, {
   runOnJS,
 } from "react-native-reanimated";
 
-import { Colors } from "../../utils/colors";
-
 export default function ProgressBar(props) {
   const { isRecording, maxDuration, onEndEvent } = props;
   const progress = useSharedValue(0);

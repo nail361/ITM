@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { View, Alert, StyleSheet } from "react-native";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -13,6 +14,7 @@ import CustomTextInput from "../ui/textInput";
 const MAX_ABOUT_SYMBOLS = 100;
 
 export default function EditProfile() {
+  const { t } = useTranslation();
   const [about, setAbout] = useState(
     useSelector((state) => state.profile.about),
   );
@@ -68,21 +70,21 @@ export default function EditProfile() {
         <CustomTextInput
           style={styles.aboutText}
           value={about}
-          label={"О себе"}
+          label={t("profile.about")}
           multiline={true}
           onChangeText={onAboutChange}
           helperVisible={aboutError}
-          helperText={`Максимальное количество символов ${MAX_ABOUT_SYMBOLS}`}
+          helperText={`${t("profile.max_symbols")} ${MAX_ABOUT_SYMBOLS}`}
         />
         <CustomText style={styles.aboutCounter}>
           {MAX_ABOUT_SYMBOLS - about.length}
         </CustomText>
         <CustomButton onPress={saveChanges} mode={"contained"}>
-          Save Changes
+          {t("profile.about_save_btn")}
         </CustomButton>
       </View>
       <CustomButton onPress={onLogout} mode={"contained"}>
-        Log Out
+        {t("profile.logout_btn")}
       </CustomButton>
     </View>
   );

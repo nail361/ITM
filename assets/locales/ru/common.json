@@ -1,3 +1,76 @@
 {
-  "test": "Тест 335353"
+  "common": {
+    "moments": "Моменты",
+    "record": "Запечатлить",
+    "profile": "Профиль",
+    "location_permission": {
+      "text": "Приложение не может работать без геопозиции",
+      "btn": "Дать доступ"
+    }
+  },
+  "auth": {
+    "sign_in_title": "Авторизация",
+    "sign_up_title": "Регистрация",
+    "sign_up": "Зарегистрироваться",
+    "sign_in": "Войти",
+    "sign_in_btn": "Вход",
+    "sign_up_btn": "Регистрация",
+    "use_email": "ПОЧТА",
+    "no_account": "Впервые у нас?",
+    "have_account": "Уже зарегистрированы?",
+    "name_field": "Имя",
+    "email_field": "Почта",
+    "password_field": "Пароль"
+  },
+  "moment": {
+    "public_btn_label": "ДЛЯ ВСЕХ",
+    "private_btn_label": "ДЛЯ ПОДПИСЧИКОВ",
+    "lifetime": "Время жизни",
+    "15m": "15м",
+    "30m": "30м",
+    "45m": "45м",
+    "60m": "1ч",
+    "submit_publish": "Запечатлить",
+    "cancel_publish": "Отмена",
+    "description": "Описание момента"
+  },
+  "moments": {
+    "location_error": "Приложение не может работать с выключеной геолокацией",
+    "world_btn_label": "МИР",
+    "local_btn_label": "РЯДОМ",
+    "only_following": "только подписки",
+    "sort_by_time": "время",
+    "sort_by_popularity": "популярность"
+  },
+  "profile": {
+    "profile_header": "Вернуться в мой профиль",
+    "edit_profile_header": "Редактирование профиля",
+    "edit_profile_btn": "Редактировать профиль",
+    "followers": "Подписчики",
+    "following": "Подписки",
+    "subscribe": "подписаться",
+    "popularity": "Популярность",
+    "about": "О себе",
+    "about_save_btn": "Сохранить изменения",
+    "logout_btn": "Разлогиниться",
+    "max_symbols": "Максимальное количество символов",
+    "delete_follower_confirm": {
+      "header": "Удалить подписчика?",
+      "text": "Вы уверены, что хотитие удалить подписчика?",
+      "submit": "Да",
+      "cancel": "Отмена"
+    },
+    "unsubscribe_follower_confirm": {
+      "header": "Отписаться",
+      "text": "Хотитие отменить подписку на пользователя?",
+      "submit": "Да",
+      "cancel": "Отмена"
+    },
+    "remove_video_confirm": {
+      "header": "Удалить видео",
+      "text": "Уверены, что хотитие удалить видео?",
+      "submit": "Да",
+      "cancel": "Отмена"
+    }
+  }
 }

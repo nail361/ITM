@@ -4,13 +4,14 @@ import { Camera, CameraType } from "expo-camera";
 import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library";
 import { useState, useRef, useEffect } from "react";
-import { Text, View, Platform } from "react-native";
+import { View, Platform, Alert } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import styles from "./styles";
 import CameraOverlay from "../../components/moment/Overlay";
-import SaveVideo from "../../components/moment/SaveVideo";
 import ProgressBar from "../../components/moment/ProgressBar";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
+import SaveVideo from "../../components/moment/SaveVideo";
+import CustomText from "../../components/ui/text";
 
 const VIDEO_MAX_DURATION = 60; //sec
 
@@ -63,7 +64,7 @@ function Moment() {
   if (!cameraPermission || !audioPermission || !galleryPermission) {
     return (
       <View>
-        <Text></Text>
+        <CustomText></CustomText>
       </View>
     );
   }
@@ -95,8 +96,7 @@ function Moment() {
             }
           }
         } catch (error) {
-          console.log("ERROR");
-          console.warn(error);
+          Alert.alert(error);
         }
       } else {
         stopRecording();

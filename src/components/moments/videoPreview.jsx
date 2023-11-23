@@ -1,12 +1,11 @@
 import { Entypo } from "@expo/vector-icons";
 import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import { useState, useRef } from "react";
-import { useTranslation } from "react-i18next";
 import { StyleSheet, View, Pressable } from "react-native";
 
+import { Colors } from "../../utils/colors";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
-import { Colors } from "../../utils/colors";
 
 function VideoPreview(props) {
   const {
