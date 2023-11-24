@@ -1,8 +1,7 @@
 import { Entypo } from "@expo/vector-icons";
 import { useRoute } from "@react-navigation/native";
-import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import { LinearGradient } from "expo-linear-gradient";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import {
   View,
@@ -13,8 +12,10 @@ import {
   Pressable,
   Alert,
   Dimensions,
+  Modal,
 } from "react-native";
 
+import Preview from "./preview";
 import { Colors } from "../../utils/colors";
 import { getUserVideos, removeVideo, getServerTime } from "../../utils/db";
 import Loading from "../ui/loading";
@@ -70,72 +71,6 @@ function Video(props) {
         </View>
       </View>
     </TouchableOpacity>
-  );
-}
-
-function Preview(props) {
-  const { preview, myProfile, onVideoClose, onVideoRemove } = props;
-  const [videoLoading, setVideoLoading] = useState(true);
-  const videoPlayer = useRef(null);
-
-  function videoLoaded() {
-    setVideoLoading(false);
-    videoPlayer.current.playAsync();
-  }
-
-  return (
-    <>
-      {/* <View style={styles.map}></View> */}
-      {myProfile && (
-        <>
-          <View style={styles.privacy}>
-            <Entypo
-              name={preview.privacy === "private" ? "lock" : "lock-open"}
-              size={20}
-              color="white"
-            />
-            <CustomText style={styles.privacyText}>
-              {preview.privacy}
-            </CustomText>
-          </View>
-
-          <Pressable
-            style={styles.removeBtn}
-            onPress={() => onVideoRemove(preview.id)}
-          >
-            <Entypo name="cup" size={25} color="white" />
-          </Pressable>
-        </>
-      )}
-      {!myProfile && (
-        <>
-          <Pressable>
-            <Entypo name="thumbs-up" size={16} color="white" />
-            <CustomText style={styles.likeText}>{preview.likes}</CustomText>
-          </Pressable>
-          <Pressable>
-            <Entypo name="thumbs-down" size={16} color="white" />
-            <CustomText style={styles.dislikeText}>
-              {preview.dislikes}
-            </CustomText>
-          </Pressable>
-        </>
-      )}
-      <Pressable style={styles.videoPreviewWrapper} onPress={onVideoClose}>
-        <VideoPlayer
-          ref={videoPlayer}
-          style={styles.videoPreview}
-          source={{
-            uri: preview.videoUrl,
-          }}
-          useNativeControls={false}
-          resizeMode={ResizeMode.CONTAIN}
-          isLooping
-          onLoad={videoLoaded}
-        />
-        {videoLoading && <Loading style={styles.videoLoading} />}
-      </Pressable>
-    </>
   );
 }
 
@@ -203,14 +138,21 @@ export default function UserMoments() {
 
   return (
     <View style={styles.container}>
-      {preview && (
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={preview !== null}
+        onRequestClose={() => {
+          onVideoClose();
+        }}
+      >
         <Preview
           preview={preview}
           myProfile={profileRoute.name === "MyProfile"}
           onVideoRemove={onVideoRemoveConfirm}
           onVideoClose={onVideoClose}
         />
-      )}
+      </Modal>
       <FlatList
         refreshing={loading}
         onRefresh={fetchVideos}
@@ -275,34 +217,6 @@ const styles = StyleSheet.create({
     color: "white",
     marginLeft: 5,
   },
-  videoPreviewWrapper: {
-    position: "absolute",
-    left: HORIZONTAL_PADDING,
-    top: 0,
-    width: "100%",
-    height: "100%",
-    backgroundColor: Colors.bgColor,
-    zIndex: 1,
-    padding: 10,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  videoPreview: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-  },
-  videoLoading: {
-    backgroundColor: "transparent",
-    position: "absolute",
-  },
-  videoLeftPanel: {
-    width: "100%",
-    height: 60,
-    position: "absolute",
-    left: 0,
-    bottom: 0,
-  },
   timer: {
     position: "absolute",
     top: 5,
@@ -324,35 +238,5 @@ const styles = StyleSheet.create({
     borderColor: "#00000030",
     borderWidth: 1,
     borderRadius: 5,
-  },
-  removeBtn: {
-    position: "absolute",
-    bottom: 15,
-    right: 25,
-    zIndex: 2,
-    backgroundColor: Colors.mainColor,
-    borderRadius: 50,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  privacy: {
-    position: "absolute",
-    flexDirection: "column",
-    alignItems: "center",
-    top: 10,
-    right: 20,
-    zIndex: 2,
-  },
-  privacyText: {
-    color: "white",
-  },
-  map: {
-    position: "absolute",
-    width: "100%",
-    height: "100%",
-    top: -50,
-    backgroundColor: "black",
   },
 });

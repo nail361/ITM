@@ -28,7 +28,9 @@ export default function AuthMenu(props) {
         >
           <View style={styles.providerButton}>
             <Entypo name="email" size={24} color="white" />
-            <CustomText style={styles.emailText}>t{"use_email"}</CustomText>
+            <CustomText style={styles.emailText}>
+              {t("auth.use_email")}
+            </CustomText>
           </View>
         </Pressable>
       </View>
