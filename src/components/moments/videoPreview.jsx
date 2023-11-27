@@ -10,6 +10,8 @@ import CustomText from "../ui/text";
 function VideoPreview(props) {
   const {
     id,
+    owner,
+    ownerName,
     videoUrl,
     likes,
     dislikes,
@@ -17,6 +19,7 @@ function VideoPreview(props) {
     onLike,
     onDislike,
     onClosePreview,
+    onOpenProfile,
   } = props;
   const [videoLoading, setVideoLoading] = useState(true);
   const videoPlayer = useRef(null);
@@ -39,6 +42,9 @@ function VideoPreview(props) {
         <Pressable style={styles.counterWrapper} onPress={() => onDislike(id)}>
           <Entypo name="thumbs-down" size={24} color="white" />
           <CustomText style={styles.counterText}>{dislikes}</CustomText>
+        </Pressable>
+        <Pressable onPress={() => onOpenProfile(owner)}>
+          <CustomText style={styles.userName}>{ownerName}</CustomText>
         </Pressable>
         <CustomText style={styles.description}>{description}</CustomText>
       </View>
@@ -99,11 +105,18 @@ const styles = StyleSheet.create({
     color: "white",
     fontSize: 20,
   },
+  userName: {
+    fontSize: 14,
+    color: Colors.mainColor,
+    paddingLeft: 10,
+    paddingTop: 10,
+  },
   description: {
     width: "100%",
     height: 120,
     zIndex: 2,
-    backgroundColor: Colors.mainColor,
+    backgroundColor: Colors.bgColor,
+    color: "white",
     padding: 10,
   },
   exitPreviewBtn: {

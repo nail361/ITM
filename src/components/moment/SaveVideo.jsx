@@ -139,32 +139,36 @@ export default function SaveVideo(props) {
           />
         </View>
         <View style={styles.lifetimeWrapper}>
-          <CustomText style={styles.text}>{t("moment.lifetime")}</CustomText>
-          <View style={styles.sliderTitles}>
-            <CustomText style={styles.sliderTitle}>
-              {t("moment.15m")}
-            </CustomText>
-            <CustomText style={styles.sliderTitle}>
-              {t("moment.30m")}
-            </CustomText>
-            <CustomText style={styles.sliderTitle}>
-              {t("moment.45m")}
-            </CustomText>
-            <CustomText style={styles.sliderTitle}>
-              {t("moment.60m")}
-            </CustomText>
+          <CustomText style={styles.lifetimeText}>
+            {t("moment.lifetime")}
+          </CustomText>
+          <View style={styles.lifetimeSliderContainer}>
+            <View style={styles.sliderTitles}>
+              <CustomText style={styles.sliderTitle}>
+                {t("moment.15m")}
+              </CustomText>
+              <CustomText style={styles.sliderTitle}>
+                {t("moment.30m")}
+              </CustomText>
+              <CustomText style={styles.sliderTitle}>
+                {t("moment.45m")}
+              </CustomText>
+              <CustomText style={styles.sliderTitle}>
+                {t("moment.60m")}
+              </CustomText>
+            </View>
+            <Slider
+              style={styles.slider}
+              minimumValue={15}
+              maximumValue={60}
+              step={15}
+              value={videoLifetime}
+              minimumTrackTintColor={Colors.mainColor}
+              maximumTrackTintColor={Colors.lightTextColor}
+              thumbTintColor={Colors.mainColor}
+              onSlidingComplete={(value) => setLifetime(value)}
+            />
           </View>
-          <Slider
-            style={styles.slider}
-            minimumValue={15}
-            maximumValue={60}
-            step={15}
-            value={videoLifetime}
-            minimumTrackTintColor={Colors.mainColor}
-            maximumTrackTintColor={Colors.lightTextColor}
-            thumbTintColor={Colors.mainColor}
-            onSlidingComplete={(value) => setLifetime(value)}
-          />
         </View>
       </View>
       <View style={styles.buttons}>
@@ -181,16 +185,13 @@ export default function SaveVideo(props) {
 
 const styles = StyleSheet.create({
   container: {
-    position: "absolute",
-    top: 0,
-    left: 0,
     width: "100%",
     height: "100%",
     backgroundColor: Colors.bgColor,
   },
   videoContainer: {
-    position: "relative",
     flex: 1,
+    paddingTop: 10,
   },
   playBtn: {
     position: "absolute",
@@ -207,21 +208,19 @@ const styles = StyleSheet.create({
   },
   privacyWrapper: {
     flexDirection: "row",
-    marginTop: 15,
     alignItems: "center",
   },
   description: {
     width: "100%",
     height: 50,
-    marginTop: 5,
     padding: 5,
     color: "black",
     verticalAlign: "top",
     backgroundColor: Colors.lightTextColor,
   },
-  text: {
+  lifetimeText: {
     color: "white",
-    fontSize: 18,
+    fontSize: 16,
   },
   selected: {
     borderWidth: 5,
@@ -248,20 +247,21 @@ const styles = StyleSheet.create({
     marginTop: 25,
     position: "relative",
   },
+  lifetimeSliderContainer: {
+    flexDirection: "column",
+  },
   slider: {
     width: 250,
     height: 40,
   },
   sliderTitles: {
-    position: "absolute",
-    width: 230,
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    top: -5,
-    left: 75,
+    paddingHorizontal: 10,
   },
   sliderTitle: {
     color: "white",
+    fontSize: 14,
   },
 });

@@ -1,5 +1,6 @@
 import { Entypo } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
+import { useNavigation } from "@react-navigation/native";
 import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
@@ -8,6 +9,7 @@ import { View, Pressable, FlatList, Alert } from "react-native";
 import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useSelector } from "react-redux";
 
 import styles from "./styles";
 import CustomMarker from "../../components/moments/marker";
@@ -24,6 +26,7 @@ const MAX_RADIUS = 6000;
 
 function Moments() {
   const insets = useSafeAreaInsets();
+  const myUid = useSelector((state) => state.auth.uid);
   const [type, setType] = useState("local");
   const [radius, setRadius] = useState(500); //in meters
   const [videos, setVideos] = useState([]);
@@ -38,6 +41,7 @@ function Moments() {
   const [sorting, setSorting] = useState("time");
   const [sortDirection, setSotrDirection] = useState(1);
   const { t } = useTranslation();
+  const navigation = useNavigation();
 
   const delta = radius / MIN_RADIUS / 100;
 
@@ -100,6 +104,11 @@ function Moments() {
     setVideo(null);
   }
 
+  function onOpenProfile(uid) {
+    if (uid === myUid) navigation.navigate("MyProfile");
+    else navigation.navigate("UserProfile", { uid });
+  }
+
   function onLike(id) {
     console.log(id);
   }
@@ -121,6 +130,7 @@ function Moments() {
           onClosePreview={onClosePreview}
           onLike={onLike}
           onDislike={onDislike}
+          onOpenProfile={onOpenProfile}
         />
       )}
       <SegmentedButtons

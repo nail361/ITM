@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "ITM",
-    "slug": "ITM",
+    "slug": "inthemoment",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -87,6 +87,12 @@
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "b3075837-eeaf-41d0-9a0f-8bbe4bd0b782"
+      }
+    },
+    "owner": "nail361"
   }
 }

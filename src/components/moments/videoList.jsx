@@ -1,22 +1,21 @@
-import { StyleSheet, View, Pressable } from "react-native";
+import { StyleSheet, View, Text, Pressable } from "react-native";
+
 import { Colors } from "../../utils/colors";
-import CustomText from "../ui/text";
 import CustomAvatar from "../ui/avatar";
+import CustomText from "../ui/text";
 
 function VideoList(props) {
   const { id, photo, description, createdAt, selected, onPress } = props;
 
   const time = new Date(createdAt).toLocaleTimeString();
 
-  const preparedDescription = description;
-
   return (
     <Pressable onPress={() => onPress(id)}>
       <View style={[styles.container, selected ? styles.selected : null]}>
         <CustomAvatar size={25} photo={photo} />
-        <CustomText style={styles.description}>
-          {preparedDescription}
-        </CustomText>
+        <Text style={styles.description} numberOfLines={1} ellipsizeMode="tail">
+          {description}
+        </Text>
         <CustomText style={styles.time}>{time}</CustomText>
       </View>
     </Pressable>
@@ -37,14 +36,17 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    marginVertical: 3,
+    marginTop: 3,
   },
   selected: {
     borderColor: "green",
     borderWidth: 2,
   },
   description: {
-    marginLeft: 10,
+    fontFamily: "ubuntu",
+    fontSize: 16,
+    paddingHorizontal: 10,
+    flex: 1,
     color: Colors.headerTextColor,
   },
   time: {
