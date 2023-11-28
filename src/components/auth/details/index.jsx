@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { View, Alert } from "react-native";
+import { View, Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useDispatch } from "react-redux";
 
 import styles from "./styles";
@@ -77,7 +77,10 @@ export default function AuthDetails(props) {
   if (loading) return <Loading />;
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <CustomTextInput
         onChangeText={(text) => setName(text)}
         style={styles.textIn}
@@ -104,6 +107,6 @@ export default function AuthDetails(props) {
       <CustomButton disabled={!correctData} onPress={onSubmit}>
         {authPage === 0 ? t("auth.sign_in_btn") : t("auth.sign_up_btn")}
       </CustomButton>
-    </View>
+    </KeyboardAvoidingView>
   );
 }

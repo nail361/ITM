@@ -169,22 +169,48 @@ export async function _getUserInfo(_uid) {
   });*/
 }
 
+export async function _searchUsers(searchText) {
+  return [
+    {
+      uid: "1",
+      photo: "",
+      name: "Denis",
+      about: "Обо мне",
+    },
+    {
+      uid: "2",
+      photo: "",
+      name: "Maxim",
+      about: "Обо мне",
+    },
+    {
+      uid: "3",
+      photo: "",
+      name: "Sergey",
+      about: "Обо мне",
+    },
+  ];
+}
+
 export async function _getUsersInfo(uids, data) {
   return [
     {
       uid: "1",
       photo: "",
       name: "Denis",
+      about: "Обо мне",
     },
     {
       uid: "2",
       photo: "",
       name: "Maxim",
+      about: "Обо мне",
     },
     {
       uid: "3",
       photo: "",
       name: "Sergey",
+      about: "Обо мне",
     },
   ];
 }

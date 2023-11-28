@@ -22,18 +22,15 @@ export default function Preview(props) {
 
   useEffect(() => {
     getMap();
-  }, [preview.videoUrl]);
-
-  useEffect(() => {
     const myInterval = setInterval(() => {
       setMapIndex((prevIndex) => {
-        if (prevIndex >= mapImages.length - 1) return 0;
+        if (prevIndex >= 3) return 0;
         else return ++prevIndex;
       });
     }, 3000);
 
     return () => clearInterval(myInterval);
-  }, []);
+  }, [preview.videoUrl]);
 
   function videoLoaded() {
     setVideoLoading(false);
@@ -54,6 +51,9 @@ export default function Preview(props) {
     ]);
   }
 
+  console.log(mapIndex);
+  console.log(mapImages[mapIndex]);
+
   return (
     <>
       <View style={styles.map}>
@@ -62,7 +62,7 @@ export default function Preview(props) {
           source={mapImages[mapIndex] || ""}
           placeholder={blurhash}
           contentFit="contain"
-          transition={800}
+          transition={1000}
         />
       </View>
       <Pressable style={styles.container} onPress={onVideoClose}>

@@ -1,5 +1,6 @@
+import { FontAwesome5 } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View, Pressable, Alert } from "react-native";
 import { useSelector } from "react-redux";
@@ -128,6 +129,10 @@ export default function UserInfo(props) {
     navigation.navigate("followers");
   }
 
+  function onSearch() {
+    navigation.navigate("search");
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -138,6 +143,11 @@ export default function UserInfo(props) {
 
   return (
     <View style={styles.container}>
+      {profileRoute.name === "MyProfile" && (
+        <Pressable style={styles.search} onPress={onSearch}>
+          <FontAwesome5 name="search" size={22} color={Colors.mainColor} />
+        </Pressable>
+      )}
       <CustomText>{name}</CustomText>
       <CustomAvatar size={80} photo={photo} />
       <CustomText style={styles.aboutText}>{about}</CustomText>
@@ -207,5 +217,10 @@ const styles = StyleSheet.create({
     width: "100%",
     borderBottomWidth: 1,
     borderColor: "lightgray",
+  },
+  search: {
+    position: "absolute",
+    top: 5,
+    right: 10,
   },
 });

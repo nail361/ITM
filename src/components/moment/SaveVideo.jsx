@@ -4,7 +4,13 @@ import * as Location from "expo-location";
 import * as VideoThumbnails from "expo-video-thumbnails";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
-import { View, StyleSheet, Pressable } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Pressable,
+  KeyboardAvoidingView,
+  Platform,
+} from "react-native";
 import { SegmentedButtons } from "react-native-paper";
 
 import UploadProgress from "./UploadProgress";
@@ -85,7 +91,10 @@ export default function SaveVideo(props) {
   }
 
   return (
-    <View style={styles.container}>
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+    >
       <View style={styles.videoContainer}>
         <Pressable
           style={styles.playBtn}
@@ -179,7 +188,7 @@ export default function SaveVideo(props) {
           {t("moment.submit_publish")}
         </CustomButton>
       </View>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 

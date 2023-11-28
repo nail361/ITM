@@ -14,6 +14,7 @@ import EditProfile from "../../components/profile/editProfile";
 import Followers from "../../components/profile/followers";
 import Following from "../../components/profile/following";
 import MainProfile from "../../components/profile/mainProfile";
+import Search from "../../components/profile/search";
 import Loading from "../../components/ui/loading";
 import { profileActions } from "../../store/profile";
 import { getUserInfo } from "../../utils/db";
@@ -106,6 +107,13 @@ function Profile() {
         initialParams={{ profileRoute: route }}
         options={{
           title: t("profile.following"),
+        }}
+      />
+      <Stack.Screen
+        name="search"
+        component={Search}
+        options={{
+          title: t("profile.search_header"),
         }}
       />
     </Stack.Navigator>

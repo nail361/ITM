@@ -30,7 +30,7 @@
     "30m": "30м",
     "45m": "45м",
     "60m": "1ч",
-    "submit_publish": "Запечатлить",
+    "submit_publish": "Запечатлеть",
     "cancel_publish": "Отмена",
     "description": "Описание момента"
   },
@@ -43,6 +43,8 @@
     "sort_by_popularity": "популярность"
   },
   "profile": {
+    "search_header": "поиск пользователя",
+    "search_field": "имя пользователя",
     "profile_header": "Вернуться назад",
     "edit_profile_header": "Редактирование профиля",
     "edit_profile_btn": "Редактировать профиль",

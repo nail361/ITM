@@ -43,6 +43,8 @@
     "sort_by_popularity": "popularity"
   },
   "profile": {
+    "search_header": "search profile",
+    "search_field": "profile name",
     "profile_header": "Return back",
     "edit_profile_header": "Edit profile",
     "edit_profile_btn": "Edit profile",

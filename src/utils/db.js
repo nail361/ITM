@@ -13,6 +13,7 @@ import {
   _getUsersInfo,
   _getFollowing,
   _getFollowers,
+  _searchUsers,
 } from "./parse-server";
 
 export function init() {
@@ -69,4 +70,8 @@ export async function getFollowing(uid) {
 
 export async function getFollowers(uid) {
   return await _getFollowers(uid);
+}
+
+export async function searchUsers(searchText) {
+  return await _searchUsers(searchText);
 }

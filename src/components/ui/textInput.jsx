@@ -1,4 +1,5 @@
 import { TextInput, HelperText } from "react-native-paper";
+
 import { Colors } from "../../utils/colors";
 
 const CustomTextInput = (props) => (
@@ -13,12 +14,14 @@ const CustomTextInput = (props) => (
       underlineColor={Colors.lightTextColor}
       cursorColor={Colors.lightTextColor}
     />
-    <HelperText
-      type={props.helperType || "error"}
-      visible={props.helperVisible}
-    >
-      {props.helperText}
-    </HelperText>
+    {props.helperText && (
+      <HelperText
+        type={props.helperType || "error"}
+        visible={props.helperVisible}
+      >
+        {props.helperText}
+      </HelperText>
+    )}
   </>
 );
 

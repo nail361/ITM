@@ -79,7 +79,11 @@ function CameraOverlay(props: CameraOverlayType) {
         </View>
       </View>
       <View style={styles.sidebar}>
-        <Pressable onPress={onToggleCameraDirection} disabled={isRecording}>
+        <Pressable
+          onPress={onToggleCameraDirection}
+          disabled={isRecording}
+          style={isRecording ? styles.transparent : null}
+        >
           <Entypo name="cycle" size={36} color="white" />
         </Pressable>
         <Pressable onPress={onToggleFlashlight}>
@@ -124,6 +128,9 @@ const styles = StyleSheet.create({
   disabled: {
     backgroundColor: "#ff402030",
     borderColor: "#ff404030",
+  },
+  transparent: {
+    opacity: 0.5,
   },
   gallery: {
     borderWidth: 2,
