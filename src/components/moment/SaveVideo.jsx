@@ -20,6 +20,8 @@ import CustomButton from "../ui/button";
 import CustomText from "../ui/text";
 import CustomTextInput from "../ui/textInput";
 
+const MAX_DESC_SYMBOLS = 100;
+
 export default function SaveVideo(props) {
   const [status, setStatus] = useState({});
   const [isUploading, setUploading] = useState(false);
@@ -117,14 +119,21 @@ export default function SaveVideo(props) {
         />
       </View>
       <View style={styles.videoInfo}>
-        <CustomTextInput
-          style={styles.description}
-          maxLength={150}
-          multiline
-          label={t("moment.description")}
-          value={videoDescription}
-          onChangeText={(text) => setDesctiption(text)}
-        />
+        <View>
+          <CustomTextInput
+            style={styles.description}
+            maxLength={150}
+            multiline
+            label={t("moment.description")}
+            value={videoDescription}
+            onChangeText={(text) => setDesctiption(text)}
+            helperVisible={videoDescription.length > MAX_DESC_SYMBOLS}
+            helperText={`${t("moment.max_symbols")} ${MAX_DESC_SYMBOLS}`}
+          />
+          <CustomText style={styles.descCounter}>
+            {MAX_DESC_SYMBOLS - videoDescription.length}
+          </CustomText>
+        </View>
         <View style={styles.privacyWrapper}>
           <SegmentedButtons
             value={videoPrivacy}
@@ -184,7 +193,11 @@ export default function SaveVideo(props) {
         <CustomButton style={styles.w150} onPress={cancelPublish}>
           {t("moment.cancel_publish")}
         </CustomButton>
-        <CustomButton style={styles.w150} onPress={onPublish}>
+        <CustomButton
+          style={styles.w150}
+          disabled={videoDescription.length > MAX_DESC_SYMBOLS}
+          onPress={onPublish}
+        >
           {t("moment.submit_publish")}
         </CustomButton>
       </View>
@@ -218,14 +231,22 @@ const styles = StyleSheet.create({
   privacyWrapper: {
     flexDirection: "row",
     alignItems: "center",
+    marginTop: 5,
   },
   description: {
     width: "100%",
-    height: 50,
+    height: 70,
     padding: 5,
     color: "black",
     verticalAlign: "top",
     backgroundColor: Colors.lightTextColor,
+  },
+  descCounter: {
+    position: "absolute",
+    color: "white",
+    fontSize: 14,
+    right: 10,
+    top: 0,
   },
   lifetimeText: {
     color: "white",

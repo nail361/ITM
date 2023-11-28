@@ -18,18 +18,12 @@ export default function EditProfile() {
   const [about, setAbout] = useState(
     useSelector((state) => state.profile.about),
   );
-  const [aboutError, setAboutError] = useState(false);
   const [loader, setLoader] = useState(false);
 
   const dispatch = useDispatch();
 
   function onAboutChange(aboutText) {
-    if (aboutText.length > MAX_ABOUT_SYMBOLS) {
-      setAboutError(true);
-    } else {
-      setAboutError(false);
-      setAbout(aboutText);
-    }
+    setAbout(aboutText);
   }
 
   async function saveChanges() {
@@ -73,7 +67,7 @@ export default function EditProfile() {
           label={t("profile.about")}
           multiline={true}
           onChangeText={onAboutChange}
-          helperVisible={aboutError}
+          helperVisible={about.length > MAX_ABOUT_SYMBOLS}
           helperText={`${t("profile.max_symbols")} ${MAX_ABOUT_SYMBOLS}`}
         />
         <CustomText style={styles.aboutCounter}>
