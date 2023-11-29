@@ -1,14 +1,25 @@
 import { StyleSheet, View } from "react-native";
 import { Marker } from "react-native-maps";
+
+import { Colors } from "../../utils/colors";
 import CustomAvatar from "../ui/avatar";
 
 function CustomMarker(props) {
-  const { id, photo, location, selected, onPress } = props;
+  const { id, photo, likes, dislikes, location, selected, mapZoom, onPress } =
+    props;
 
-  const size = 50;
-  const borderColor = "red";
+  const videoPopularity =
+    Math.max(
+      Math.round(((likes - dislikes) / (likes + dislikes)) * 100) || 0,
+      0,
+    ) / 2;
+
+  const size = 20 + videoPopularity;
+  const borderColor = Colors.bgColor;
   const borderWidth = 2;
   const zIndex = selected ? 100 : 1;
+
+  const hidden = !selected && size + mapZoom * 2 < 75;
 
   return (
     <Marker
@@ -31,6 +42,7 @@ function CustomMarker(props) {
             zIndex,
           },
           selected ? styles.selected : null,
+          hidden ? styles.hidden : null,
         ]}
       >
         <CustomAvatar size={size - borderWidth} photo={photo} />
@@ -49,6 +61,9 @@ const styles = StyleSheet.create({
   selected: {
     borderColor: "green",
     zIndex: 100,
+  },
+  hidden: {
+    opacity: 0,
   },
   avatar: {
     borderRadius: 50,

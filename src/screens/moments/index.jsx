@@ -42,6 +42,7 @@ function Moments() {
   const [sortDirection, setSotrDirection] = useState(1);
   const { t } = useTranslation();
   const navigation = useNavigation();
+  const [mapZoom, setMapZoom] = useState(5);
 
   const delta = radius / MIN_RADIUS / 100;
 
@@ -122,6 +123,17 @@ function Moments() {
     setSotrDirection((prevState) => prevState * -1);
   }
 
+  function onRadiusChange(value) {
+    setRadius(value);
+  }
+
+  function onMapMove(region) {
+    const { latitudeDelta } = region;
+    let zoom = 30 - Math.round(latitudeDelta * 1000);
+    if (zoom <= 0) zoom = 1;
+    setMapZoom(zoom);
+  }
+
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
       {video && (
@@ -190,6 +202,7 @@ function Moments() {
           latitudeDelta: delta,
           longitudeDelta: delta,
         }}
+        onRegionChangeComplete={onMapMove}
       >
         <Circle
           center={{
@@ -205,6 +218,7 @@ function Moments() {
             key={video.id}
             selected={video.id === selectedVideo}
             {...video}
+            mapZoom={mapZoom}
             onPress={showPreview}
           />
         ))}
@@ -219,7 +233,7 @@ function Moments() {
         maximumTrackTintColor={Colors.lightTextColor}
         thumbTintColor={Colors.mainColor}
         onSlidingComplete={onChangeRadiusComplete}
-        onValueChange={(value) => setRadius(value)}
+        onValueChange={onRadiusChange}
       />
       <View style={styles.sorting}>
         <Pressable style={styles.sortingRow} onPress={() => onSort("time")}>

@@ -7,6 +7,7 @@ import { useSelector } from "react-redux";
 
 import { Colors } from "../../utils/colors";
 import { getUserInfo } from "../../utils/db";
+import { calculatePopularity } from "../../utils/utils";
 import CustomAvatar from "../ui/avatar";
 import CustomButton from "../ui/button";
 import Loading from "../ui/loading";
@@ -15,11 +16,10 @@ import CustomText from "../ui/text";
 const MAX_FOLLOWERS = 10000000;
 
 function Popularity(props) {
-  const { likes, dislikes, followers } = props;
+  const { popularity } = props;
 
-  const percent = 50; // придумать формулу
   const max_width = 75;
-  const width = max_width * (Math.abs(percent) / 100);
+  const width = max_width * (Math.abs(popularity) / 100);
   const borderRadius = 10;
 
   return (
@@ -39,15 +39,15 @@ function Popularity(props) {
         style={{
           width,
           height: 15,
-          borderTopLeftRadius: percent < 0 ? borderRadius : 0,
-          borderBottomLeftRadius: percent < 0 ? borderRadius : 0,
-          borderTopRightRadius: percent > 0 ? borderRadius : 0,
-          borderBottomRightRadius: percent > 0 ? borderRadius : 0,
+          borderTopLeftRadius: popularity < 0 ? borderRadius : 0,
+          borderBottomLeftRadius: popularity < 0 ? borderRadius : 0,
+          borderTopRightRadius: popularity > 0 ? borderRadius : 0,
+          borderBottomRightRadius: popularity > 0 ? borderRadius : 0,
           backgroundColor:
-            percent > 0 ? Colors.popularity.p90 : Colors.popularity.m90,
+            popularity > 0 ? Colors.popularity.p90 : Colors.popularity.m90,
           transform: [
-            { scaleY: Math.sign(percent) },
-            { translateX: (width / 2) * Math.sign(percent) },
+            { scaleY: Math.sign(popularity) },
+            { translateX: (width / 2) * Math.sign(popularity) },
           ],
         }}
       />
@@ -73,10 +73,11 @@ export default function UserInfo(props) {
 
   let about = "";
   let photo = "";
-  let likes = "";
-  let dislikes = "";
-  let followers = "";
-  let following = "";
+  let likes = 0;
+  let dislikes = 0;
+  let followers = [];
+  let following = [];
+  let popularity = 0;
 
   if (profileRoute.name === "MyProfile") {
     name = useSelector((state) => state.auth.username);
@@ -87,6 +88,8 @@ export default function UserInfo(props) {
     dislikes = useSelector((state) => state.profile.dislikes);
     followers = useSelector((state) => state.profile.followers);
     following = useSelector((state) => state.profile.following);
+
+    popularity = calculatePopularity(likes, dislikes, followers.length);
   }
 
   useEffect(() => {
@@ -110,6 +113,8 @@ export default function UserInfo(props) {
       dislikes = response.dislikes;
       followers = response.followers;
       followers = response.followers;
+
+      popularity = calculatePopularity(likes, dislikes, followers.length);
     }
 
     setLoading(false);
@@ -160,7 +165,7 @@ export default function UserInfo(props) {
         </Pressable>
         <View style={styles.counterContainer}>
           <CustomText>{t("profile.popularity")}</CustomText>
-          <Popularity likes={likes} dislikes={dislikes} followers={followers} />
+          <Popularity popularity={popularity} />
         </View>
         <Pressable style={styles.counterContainer} onPress={onFollowersPress}>
           <CustomText style={styles.counter}>{followers.length}</CustomText>
