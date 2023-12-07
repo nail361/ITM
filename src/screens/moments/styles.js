@@ -9,19 +9,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.bgColor,
     alignItems: "center",
   },
-  map: {
-    width: "100%",
-    height: "50%",
-    marginTop: 10,
-  },
-  marker: {
-    width: 30,
-    height: 30,
-    borderRadius: 50,
-    borderWidth: 1,
-    backgroundColor: "#ffffff50",
-    borderColor: "black",
-  },
   radiusSlider: {
     width: "90%",
     height: 50,
@@ -61,9 +48,23 @@ const styles = StyleSheet.create({
     position: "absolute",
     left: 10,
     zIndex: 1,
+    backgroundColor: "#454d6670",
+    paddingLeft: 5,
+    borderRadius: 5,
   },
   switcherText: {
-    color: Colors.headerTextColor,
+    color: "white",
+  },
+  mapContainer: {
+    width: "100%",
+    height: "50%",
+    marginTop: 10,
+    justifyContent: "center",
+    alignItems: "center",
+    overflow: "hidden",
+  },
+  map: {
+    ...StyleSheet.absoluteFillObject,
   },
 });
 

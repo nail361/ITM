@@ -51,9 +51,6 @@ export default function Preview(props) {
     ]);
   }
 
-  console.log(mapIndex);
-  console.log(mapImages[mapIndex]);
-
   return (
     <>
       <View style={styles.map}>

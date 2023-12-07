@@ -232,3 +232,8 @@ export async function _getFollowers(_uid) {
 
   return ["1", "2", "3"];
 }
+
+export async function _publishAvatar(photo) {
+  const uid = await getUserId();
+  return "https://img.freepik.com/free-photo/a-cupcake-with-a-strawberry-on-top-and-a-strawberry-on-the-top_1340-35087.jpg";
+}

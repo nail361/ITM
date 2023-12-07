@@ -1,21 +1,19 @@
 import { Entypo } from "@expo/vector-icons";
 import Slider from "@react-native-community/slider";
 import { useNavigation } from "@react-navigation/native";
-import { Video as VideoPlayer, ResizeMode } from "expo-av";
 import * as Location from "expo-location";
 import { useEffect, useState, useRef } from "react";
 import { useTranslation } from "react-i18next";
 import { View, Pressable, FlatList, Alert } from "react-native";
-import MapView, { Circle } from "react-native-maps";
 import { SegmentedButtons } from "react-native-paper";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useSelector } from "react-redux";
 
 import styles from "./styles";
+import Map from "../../components/moments/map";
 import CustomMarker from "../../components/moments/marker";
 import VideoList from "../../components/moments/videoList";
 import VideoPreview from "../../components/moments/videoPreview";
-import Loading from "../../components/ui/loading";
 import CustomSwitcher from "../../components/ui/switcher";
 import CustomText from "../../components/ui/text";
 import { Colors } from "../../utils/colors";
@@ -44,7 +42,9 @@ function Moments() {
   const navigation = useNavigation();
   const [mapZoom, setMapZoom] = useState(5);
 
-  const delta = radius / MIN_RADIUS / 100;
+  const [newRegion, setNewRegion] = useState();
+
+  // const delta = radius / MIN_RADIUS / 100;
 
   const orderedVideos = videos.sort((a, b) => {
     let sort = 0;
@@ -132,7 +132,19 @@ function Moments() {
     let zoom = 30 - Math.round(latitudeDelta * 1000);
     if (zoom <= 0) zoom = 1;
     setMapZoom(zoom);
+
+    setNewRegion(region);
   }
+
+  const mapMarkers = videos.map((video) => (
+    <CustomMarker
+      key={video.id}
+      selected={video.id === selectedVideo}
+      {...video}
+      mapZoom={mapZoom}
+      onPress={showPreview}
+    />
+  ));
 
   return (
     <View style={[styles.container, { paddingTop: insets.top }]}>
@@ -166,7 +178,7 @@ function Moments() {
           },
         ]}
       />
-      <View style={[styles.switcherRow, { top: insets.top + 50 }]}>
+      <View style={[styles.switcherRow, { top: insets.top + 60 }]}>
         <CustomText style={styles.switcherText}>
           {t("moments.only_following")}
         </CustomText>
@@ -177,52 +189,16 @@ function Moments() {
           }}
         />
       </View>
-      <MapView
-        style={styles.map}
-        showsUserLocation={false}
-        minZoomLevel={11}
-        maxZoomLevel={20}
-        showsPointsOfInterest={false}
-        // showsBuildings={false}
-        pitchEnabled={false}
-        zoomTapEnabled={false}
-        // zoomControlEnabled={false}
-        rotateEnabled={false}
-        // scrollEnabled={false}
-        showsCompass={false}
-        initialRegion={{
-          latitude: myLocation.latitude,
-          longitude: myLocation.longitude,
-          latitudeDelta: delta,
-          longitudeDelta: delta,
-        }}
-        region={{
-          latitude: myLocation.latitude,
-          longitude: myLocation.longitude,
-          latitudeDelta: delta,
-          longitudeDelta: delta,
-        }}
-        onRegionChangeComplete={onMapMove}
-      >
-        <Circle
-          center={{
-            latitude: myLocation.latitude,
-            longitude: myLocation.longitude,
-          }}
-          radius={radius}
-          strokeColor="#55555550"
-          fillColor="#0000ff20"
+      <View style={styles.mapContainer}>
+        <Map
+          location={myLocation}
+          circleRadius={radius}
+          // delta={latitudeDelta}
+          newRegion={newRegion}
+          onMapMove={onMapMove}
+          markers={mapMarkers}
         />
-        {videos.map((video) => (
-          <CustomMarker
-            key={video.id}
-            selected={video.id === selectedVideo}
-            {...video}
-            mapZoom={mapZoom}
-            onPress={showPreview}
-          />
-        ))}
-      </MapView>
+      </View>
       <Slider
         style={styles.radiusSlider}
         minimumValue={MIN_RADIUS}

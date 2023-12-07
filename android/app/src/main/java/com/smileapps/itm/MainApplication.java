@@ -16,6 +16,8 @@ import com.facebook.soloader.SoLoader;
 import expo.modules.ApplicationLifecycleDispatcher;
 import expo.modules.ReactNativeHostWrapper;
 
+import com.airbnb.android.react.maps.MapsPackage;
+
 import java.util.List;
 
 public class MainApplication extends Application implements ReactApplication {

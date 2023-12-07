@@ -14,6 +14,7 @@ import {
   _getFollowing,
   _getFollowers,
   _searchUsers,
+  _publishAvatar,
 } from "./parse-server";
 
 export function init() {
@@ -74,4 +75,8 @@ export async function getFollowers(uid) {
 
 export async function searchUsers(searchText) {
   return await _searchUsers(searchText);
+}
+
+export async function publishAvatar(photo) {
+  return await _publishAvatar(photo);
 }

@@ -1,19 +1,19 @@
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, Entypo } from "@expo/vector-icons";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import * as ImagePicker from "expo-image-picker";
+import * as MediaLibrary from "expo-media-library";
 import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { StyleSheet, View, Pressable, Alert } from "react-native";
 import { useSelector } from "react-redux";
 
 import { Colors } from "../../utils/colors";
-import { getUserInfo } from "../../utils/db";
+import { getUserInfo, publishAvatar } from "../../utils/db";
 import { calculatePopularity } from "../../utils/utils";
 import CustomAvatar from "../ui/avatar";
 import CustomButton from "../ui/button";
 import Loading from "../ui/loading";
 import CustomText from "../ui/text";
-
-const MAX_FOLLOWERS = 10000000;
 
 function Popularity(props) {
   const { popularity } = props;
@@ -69,34 +69,45 @@ export default function UserInfo(props) {
   const { profileRoute } = useRoute().params;
   const [loading, setLoading] = useState(false);
 
-  let name = "";
+  const [photo, setPhoto] = useState("");
+  const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [followers, setFollowers] = useState([]);
+  const [following, setFollowing] = useState([]);
 
-  let about = "";
-  let photo = "";
-  let likes = 0;
-  let dislikes = 0;
-  let followers = [];
-  let following = [];
-  let popularity = 0;
+  const popularity = calculatePopularity(likes, dislikes, followers.length);
+
+  let _name = "";
+  let profileState = {};
 
   if (profileRoute.name === "MyProfile") {
-    name = useSelector((state) => state.auth.username);
-
-    about = useSelector((state) => state.profile.about);
-    photo = useSelector((state) => state.profile.photo);
-    likes = useSelector((state) => state.profile.likes);
-    dislikes = useSelector((state) => state.profile.dislikes);
-    followers = useSelector((state) => state.profile.followers);
-    following = useSelector((state) => state.profile.following);
-
-    popularity = calculatePopularity(likes, dislikes, followers.length);
+    profileState = useSelector((state) => state.profile);
+    _name = useSelector((state) => state.auth.username);
   }
+
+  useEffect(() => {
+    if (profileRoute.name === "MyProfile") {
+      fetchMyInfo();
+    }
+  }, [profileState]);
 
   useEffect(() => {
     if (profileRoute.name === "UserProfile") {
       fetchUserInfo();
     }
   }, []);
+
+  function fetchMyInfo() {
+    setName(_name);
+    setPhoto(profileState.photo);
+    setAbout(profileState.about);
+    setLikes(profileState.likes);
+    setDislikes(profileState.dislikes);
+    setFollowers(profileState.followers);
+    setFollowing(profileState.following);
+  }
 
   async function fetchUserInfo() {
     setLoading(true);
@@ -105,16 +116,14 @@ export default function UserInfo(props) {
     if (response.error) {
       Alert.alert(response.error);
     } else {
-      name = response.name;
+      setName(response.name);
 
-      about = response.about;
-      photo = response.photo;
-      likes = response.likes;
-      dislikes = response.dislikes;
-      followers = response.followers;
-      followers = response.followers;
-
-      popularity = calculatePopularity(likes, dislikes, followers.length);
+      setAbout(response.about);
+      // photo = response.photo;
+      setLikes(response.likes);
+      setDislikes(response.dislikes);
+      setFollowers(response.followers);
+      setFollowing(response.followers);
     }
 
     setLoading(false);
@@ -138,6 +147,38 @@ export default function UserInfo(props) {
     navigation.navigate("search");
   }
 
+  async function onChooseAvatar() {
+    const galleryStatus =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    if (galleryStatus.status === "granted") {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        quality: 0.8,
+      });
+
+      if (!result.canceled) {
+        uploadUserAvatar(result.assets[0].uri);
+      }
+    }
+  }
+
+  function uploadUserAvatar(uri) {
+    setLoading(true);
+    fetch(uri)
+      .then((response) => response.blob())
+      .then(async (blob) => {
+        const response = await publishAvatar(blob);
+        if (response.error) {
+          Alert.alert(response.error);
+        } else {
+          setPhoto(response);
+        }
+        setLoading(false);
+      });
+  }
+
   if (loading) {
     return (
       <View style={styles.container}>
@@ -154,7 +195,18 @@ export default function UserInfo(props) {
         </Pressable>
       )}
       <CustomText>{name}</CustomText>
-      <CustomAvatar size={80} photo={photo} />
+      <View>
+        <CustomAvatar size={80} photo={photo} />
+        {profileRoute.name === "MyProfile" && (
+          <Pressable style={styles.avatarBtn} onPress={onChooseAvatar}>
+            <Entypo
+              name="circle-with-plus"
+              size={24}
+              color={Colors.secondColor}
+            />
+          </Pressable>
+        )}
+      </View>
       <CustomText style={styles.aboutText}>{about}</CustomText>
       <View style={styles.statistic}>
         <Pressable style={styles.counterContainer} onPress={onFollowingPress}>
@@ -227,5 +279,12 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 5,
     right: 10,
+  },
+  avatarBtn: {
+    position: "absolute",
+    backgroundColor: "white",
+    borderRadius: 50,
+    right: 0,
+    bottom: 0,
   },
 });
